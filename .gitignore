@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+wheels/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment / secrets
+.env
+.env.local
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.sublime-project
+*.sublime-workspace
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Local database / runtime files
+instance/
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+
+# Logs
+*.log
+
+# Uploads (kept out of version control; handled at runtime)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+app/static/images/cars/*
+!app/static/images/cars/.gitkeep
+
+# OS files
+Thumbs.db
+.DS_Store

@@ -1,0 +1,127 @@
+{% extends "public/base.html" %}
+{% from "public/_car_card.html" import car_card, car_image, status_pill %}
+
+{% block title %}{{ car.make }} {{ car.model }} — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('cars.index') }}">Fleet</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ car.make }} {{ car.model }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="pill pill-light">{{ car.category.name if car.category else 'Vehicle' }}</span>
+      {{ status_pill(car) }}
+    </div>
+    <h1 class="fw-bold mt-3 mb-1">{{ car.make }} {{ car.model }}</h1>
+    <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+      <i class="bi bi-geo-alt me-1"></i>{{ car.branch.name if car.branch else 'CRMS' }}
+      {% if car.branch %} — {{ car.branch.city }}{% endif %}
+    </p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="detail-media">
+          <img src="{{ car_image(car) }}" alt="{{ car.make }} {{ car.model }}">
+        </div>
+
+        {% if car.notes %}
+          <div class="mt-4">
+            <h5 class="fw-bold mb-2">About this car</h5>
+            <p class="text-muted-2 mb-0">{{ car.notes }}</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-5">
+        <div class="booking-aside" id="book">
+          <span class="eyebrow">Rental rates</span>
+          <div class="detail-price mt-2">
+            PKR {{ '{:,.0f}'.format(car.category.daily_rate) if car.category else '—' }}
+            <span style="font-size:1rem;font-weight:400;color:var(--body);">/ day</span>
+          </div>
+          {% if car.category %}
+            <p class="text-muted-2 small mb-4">
+              Weekly PKR {{ '{:,.0f}'.format(car.category.weekly_rate) }} ·
+              Monthly PKR {{ '{:,.0f}'.format(car.category.monthly_rate) }} ·
+              Deposit PKR {{ '{:,.0f}'.format(car.category.deposit_amount) }}
+            </p>
+          {% endif %}
+
+          <h5 class="fw-bold mb-2">Book this car</h5>
+          {% if availability_reason %}
+            <div class="alert alert-warning small py-2 mb-3" role="alert">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ availability_reason }}
+            </div>
+            <a class="btn btn-outline-teal" href="{{ url_for('cars.index') }}">
+              <i class="bi bi-search me-1"></i>Browse available cars
+            </a>
+          {% else %}
+            <p class="text-muted-2 small mb-3">
+              Pick your dates and branches, review the price, then confirm your
+              reservation online.
+            </p>
+            <div class="d-grid gap-2">
+              <a class="btn btn-teal btn-lg"
+                 href="{{ url_for('bookings.new', car_id=car.id,
+                      pickup_datetime=request.args.get('pickup_datetime'),
+                      return_datetime=request.args.get('return_datetime'),
+                      pickup_branch_id=request.args.get('pickup_branch_id') or request.args.get('branch'),
+                      return_branch_id=request.args.get('return_branch_id')) }}">
+                <i class="bi bi-key me-1"></i>Rent Now
+              </a>
+              <a class="btn btn-outline-teal" href="{{ url_for('cars.index') }}">
+                Check availability
+              </a>
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-3 mt-4 small text-muted-2">
+            <span><i class="bi bi-shield-check text-crms-teal me-1"></i>Insured</span>
+            <span><i class="bi bi-tools text-crms-teal me-1"></i>Serviced</span>
+            <span><i class="bi bi-headset text-crms-teal me-1"></i>Support</span>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h5 class="fw-bold mb-2">Vehicle details</h5>
+          <table class="spec-table">
+            <tbody>
+              <tr><td>Make &amp; model</td><td>{{ car.make }} {{ car.model }}</td></tr>
+              <tr><td>Year</td><td>{{ car.year }}</td></tr>
+              <tr><td>Category</td><td>{{ car.category.name if car.category else '—' }}</td></tr>
+              <tr><td>Colour</td><td>{{ car.color or '—' }}</td></tr>
+              <tr><td>Branch</td><td>{{ car.branch.name if car.branch else '—' }}</td></tr>
+              <tr><td>Status</td><td>{{ status_pill(car) }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if related_cars %}
+<section class="section-pad bg-soft">
+  <div class="container">
+    <div class="mb-4">
+      <span class="eyebrow">More options</span>
+      <h2 class="section-title mt-2 mb-0">Similar cars</h2>
+    </div>
+    <div class="row g-4">
+      {% for related in related_cars %}
+        <div class="col-md-6 col-lg-4">{{ car_card(related) }}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

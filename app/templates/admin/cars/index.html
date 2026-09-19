@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Cars{% endblock %}
+{% block page_title %}Fleet Cars{% endblock %}
+
+{% block content %}
+  {% set status_colors = {
+    'available': 'text-bg-success',
+    'rented': 'text-bg-primary',
+    'maintenance': 'text-bg-warning',
+    'out_of_service': 'text-bg-danger',
+  } %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Cars</h2>
+      <p class="text-secondary small mb-0">All fleet vehicles across branches.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_cars.new') }}"><i class="bi bi-plus-lg me-1"></i>Add Car</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Plate</th>
+            <th>Car</th>
+            <th>Category</th>
+            <th>Branch</th>
+            <th>Status</th>
+            <th>Fuel</th>
+            <th>Mileage</th>
+            <th>Active</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for car in cars %}
+            <tr>
+              <td class="fw-semibold">{{ car.license_plate }}</td>
+              <td>{{ car.make }} {{ car.model }} <span class="text-secondary small">({{ car.year }}{% if car.color %}, {{ car.color }}{% endif %})</span></td>
+              <td>{{ car.category.name if car.category else '—' }}</td>
+              <td>{{ car.branch.name if car.branch else '—' }}</td>
+              <td><span class="badge {{ status_colors.get(car.status, 'text-bg-secondary') }}">{{ car.status.replace('_', ' ') }}</span></td>
+              <td>{{ "{:,.0f}".format(car.fuel_level) }}%</td>
+              <td>{{ "{:,}".format(car.mileage) }} km</td>
+              <td>
+                <span class="badge {{ 'text-bg-success' if car.is_active else 'text-bg-secondary' }}">
+                  {{ 'Active' if car.is_active else 'Inactive' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_cars.edit', car_id=car.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{{ url_for('admin_cars.delete', car_id=car.id) }}"
+                      onsubmit="return confirm('Delete car {{ car.make }} {{ car.model }} ({{ car.license_plate }})?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9" class="text-center text-secondary py-5">
+                <i class="bi bi-car-front fs-1 d-block mb-2 text-body-tertiary"></i>
+                No cars yet. Add your first car to the fleet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

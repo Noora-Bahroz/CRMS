@@ -1,0 +1,145 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Pickup &amp; Return · {{ record.booking.booking_number }}{% endblock %}
+{% block page_title %}Pickup &amp; Return Record{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">
+        Record for {{ record.booking.booking_number }}
+        {% if record.state == 'ready_for_pickup' %}<span class="badge text-bg-warning align-middle">Ready for pickup</span>
+        {% elif record.state == 'picked_up' %}<span class="badge text-bg-info align-middle">Picked up</span>
+        {% elif record.state == 'returned' %}<span class="badge text-bg-success align-middle">Returned</span>
+        {% else %}<span class="badge text-bg-secondary align-middle">Not applicable</span>{% endif %}
+      </h2>
+      <p class="text-secondary small mb-0">Booking status: <strong>{{ record.booking.status }}</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+      {% if record.can_pickup %}
+        <a class="btn btn-success" href="{{ url_for('admin_pickup_return.pickup', booking_id=record.booking.id) }}"><i class="bi bi-box-arrow-in-right me-1"></i>Record Pickup</a>
+      {% endif %}
+      {% if record.can_return %}
+        <a class="btn btn-primary" href="{{ url_for('admin_pickup_return.return_record', booking_id=record.booking.id) }}"><i class="bi bi-box-arrow-left me-1"></i>Record Return</a>
+      {% endif %}
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_bookings.detail', booking_id=record.booking.id) }}"><i class="bi bi-calendar-check me-1"></i>Booking</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_pickup_return.index') }}">Back</a>
+    </div>
+  </div>
+
+  {% if record.pickup_issue %}
+    <div class="alert alert-light border d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-info-circle text-secondary"></i>
+      <span>{{ record.pickup_issue }}</span>
+    </div>
+  {% endif %}
+  {% if record.return_issue and record.state != 'returned' %}
+    <div class="alert alert-light border d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-info-circle text-secondary"></i>
+      <span>{{ record.return_issue }}</span>
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-calendar-check me-2 text-secondary"></i>Booking</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="text-secondary small">Customer</div>
+              <div>{{ record.booking.customer.user.first_name }} {{ record.booking.customer.user.last_name }}<br>
+                <span class="text-secondary small">{{ record.booking.customer.user.email }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Car</div>
+              <div>{{ record.booking.car.make }} {{ record.booking.car.model }} ({{ record.booking.car.license_plate }})
+                · <span class="text-uppercase small text-secondary">{{ record.booking.car.status }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Scheduled pickup</div>
+              <div>{{ record.booking.pickup_datetime.strftime("%Y-%m-%d %H:%M") }}<br>
+                <span class="text-secondary small">{{ record.booking.pickup_branch.name }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Expected return</div>
+              <div>{{ record.booking.return_datetime.strftime("%Y-%m-%d %H:%M") }}<br>
+                <span class="text-secondary small">{{ record.booking.return_branch.name }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Actual pickup</div>
+              <div>{{ record.booking.actual_pickup_datetime.strftime("%Y-%m-%d %H:%M") if record.booking.actual_pickup_datetime else '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Actual return</div>
+              <div>{{ record.booking.actual_return_datetime.strftime("%Y-%m-%d %H:%M") if record.booking.actual_return_datetime else '—' }}</div>
+            </div>
+            {% if record.booking.driver %}
+              <div class="col-12">
+                <div class="text-secondary small">Driver</div>
+                <div>{{ record.booking.driver.first_name }} {{ record.booking.driver.last_name }}</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card mb-4">
+        <div class="card-header fw-semibold"><i class="bi bi-box-arrow-in-right me-2 text-secondary"></i>Pickup Record</div>
+        <div class="card-body">
+          {% if record.booking.rental_agreement %}
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="text-secondary small">Pickup mileage</div>
+                <div>{{ record.booking.rental_agreement.pickup_mileage }} km</div>
+              </div>
+              <div class="col-6">
+                <div class="text-secondary small">Fuel level at pickup</div>
+                <div>{{ '%.1f'|format(record.booking.rental_agreement.fuel_level_pickup) }}%</div>
+              </div>
+              <div class="col-12">
+                <div class="text-secondary small">Agreement</div>
+                <a class="text-decoration-none" href="{{ url_for('admin_agreements.detail', agreement_id=record.booking.rental_agreement.id) }}">
+                  {{ record.booking.rental_agreement.agreement_number }}
+                </a>
+                <span class="badge text-bg-light border ms-1">{{ record.booking.rental_agreement.status }}</span>
+              </div>
+            </div>
+          {% else %}
+            <div class="text-secondary small">No rental agreement linked to this booking yet.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-box-arrow-left me-2 text-secondary"></i>Return Record</div>
+        <div class="card-body">
+          {% if record.booking.rental_agreement %}
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="text-secondary small">Return mileage</div>
+                <div>{{ record.booking.rental_agreement.return_mileage|string + ' km' if record.booking.rental_agreement.return_mileage is not none else '—' }}</div>
+              </div>
+              <div class="col-6">
+                <div class="text-secondary small">Fuel level at return</div>
+                <div>{{ '%.1f'|format(record.booking.rental_agreement.fuel_level_return) ~ '%' if record.booking.rental_agreement.fuel_level_return is not none else '—' }}</div>
+              </div>
+              <div class="col-12">
+                <div class="text-secondary small">Notes</div>
+                <div>{{ record.booking.rental_agreement.notes or '—' }}</div>
+              </div>
+            </div>
+          {% else %}
+            <div class="text-secondary small">No rental agreement linked to this booking yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

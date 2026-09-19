@@ -1,0 +1,132 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Agreement · {{ agreement.agreement_number }}{% endblock %}
+{% block page_title %}Rental Agreement Details{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">
+        {{ agreement.agreement_number }}
+        {% if agreement.status == 'active' %}<span class="badge text-bg-success align-middle">Active</span>
+        {% elif agreement.status == 'draft' %}<span class="badge text-bg-secondary align-middle">Draft</span>
+        {% elif agreement.status == 'completed' %}<span class="badge text-bg-info align-middle">Completed</span>
+        {% else %}<span class="badge text-bg-danger align-middle">Terminated</span>{% endif %}
+      </h2>
+      <p class="text-secondary small mb-0">Created {{ agreement.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{{ url_for('admin_agreements.edit', agreement_id=agreement.id) }}"><i class="bi bi-pencil me-1"></i>Edit</a>
+      {% if agreement.status != 'terminated' %}
+        <form method="post" action="{{ url_for('admin_agreements.delete', agreement_id=agreement.id) }}"
+              onsubmit="return confirm('Terminate agreement {{ agreement.agreement_number }}?');">
+          <button class="btn btn-outline-danger" type="submit"><i class="bi bi-x-lg me-1"></i>Terminate</button>
+        </form>
+      {% endif %}
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_agreements.index') }}">Back</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-building-check me-2 text-secondary"></i>Vehicle Condition</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-secondary small">Pickup mileage</div>
+              <div>{{ agreement.pickup_mileage }} km</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Return mileage</div>
+              <div>{{ agreement.return_mileage|string + ' km' if agreement.return_mileage is not none else '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Fuel level at pickup</div>
+              <div>{{ '%.1f'|format(agreement.fuel_level_pickup) }}%</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Fuel level at return</div>
+              <div>{{ '%.1f'|format(agreement.fuel_level_return) ~ '%' if agreement.fuel_level_return is not none else '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header fw-semibold"><i class="bi bi-pen me-2 text-secondary"></i>Signatures</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="text-secondary small">Customer signed</div>
+              <span class="badge {{ 'text-bg-success' if agreement.signed_by_customer else 'text-bg-secondary' }}">
+                {{ 'Yes' if agreement.signed_by_customer else 'No' }}
+              </span>
+            </div>
+            <div class="col-md-4">
+              <div class="text-secondary small">Staff signed</div>
+              <span class="badge {{ 'text-bg-success' if agreement.signed_by_staff else 'text-bg-secondary' }}">
+                {{ 'Yes' if agreement.signed_by_staff else 'No' }}
+              </span>
+            </div>
+            <div class="col-md-4">
+              <div class="text-secondary small">Signed at</div>
+              <div>{{ agreement.signed_at.strftime("%Y-%m-%d") if agreement.signed_at else '—' }}</div>
+            </div>
+          </div>
+          <hr class="my-3">
+          <div class="text-secondary small">Terms and conditions</div>
+          <div class="text-wrap">{{ agreement.terms_and_conditions }}</div>
+          <hr class="my-3">
+          <div class="text-secondary small">Notes</div>
+          <div>{{ agreement.notes or '—' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-calendar-check me-2 text-secondary"></i>Booking</div>
+        <div class="card-body">
+          <div class="fs-5 fw-semibold">
+            <a class="text-decoration-none" href="{{ url_for('admin_bookings.detail', booking_id=agreement.booking.id) }}">{{ agreement.booking.booking_number }}</a>
+          </div>
+          <hr class="my-3">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="text-secondary small">Customer</div>
+              <div>{{ agreement.booking.customer.user.first_name }} {{ agreement.booking.customer.user.last_name }}<br>
+                <span class="text-secondary small">{{ agreement.booking.customer.user.email }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Car</div>
+              <div>{{ agreement.booking.car.make }} {{ agreement.booking.car.model }} ({{ agreement.booking.car.license_plate }})</div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Pickup</div>
+              <div>{{ agreement.booking.pickup_datetime.strftime("%Y-%m-%d %H:%M") }}<br>
+                <span class="text-secondary small">{{ agreement.booking.pickup_branch.name }}</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Return</div>
+              <div>{{ agreement.booking.return_datetime.strftime("%Y-%m-%d %H:%M") }}<br>
+                <span class="text-secondary small">{{ agreement.booking.return_branch.name }}</span>
+              </div>
+            </div>
+            {% if agreement.booking.driver %}
+              <div class="col-12">
+                <div class="text-secondary small">Driver</div>
+                <div>{{ agreement.booking.driver.first_name }} {{ agreement.booking.driver.last_name }}</div>
+              </div>
+            {% endif %}
+            <div class="col-12">
+              <div class="d-flex justify-content-between py-1"><span class="text-secondary">Booking status</span><span class="text-uppercase small">{{ agreement.booking.status }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

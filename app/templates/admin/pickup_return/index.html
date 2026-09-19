@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Pickup &amp; Return Records{% endblock %}
+{% block page_title %}Pickup &amp; Return Records{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Pickup &amp; Return Records</h2>
+      <p class="text-secondary small mb-0">Record the physical pickup and return of each booked vehicle.</p>
+    </div>
+  </div>
+
+  <form class="mb-3 row g-2" method="get" action="{{ url_for('admin_pickup_return.index') }}" role="search">
+    <div class="col-auto input-group" style="max-width: 420px;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input class="form-control" type="search" name="q" placeholder="Search booking, customer or car…"
+             value="{{ search_term }}" aria-label="Search pickup/return records">
+    </div>
+    <div class="col-auto">
+      <select class="form-select" name="state" aria-label="Filter by record state">
+        <option value="">All records</option>
+        {% for value, label in states %}
+          <option value="{{ value }}" {{ 'selected' if value == state_filter }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" type="submit">Filter</button>
+      {% if search_term or state_filter %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_pickup_return.index') }}" title="Clear">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Booking</th>
+            <th>Customer</th>
+            <th>Car</th>
+            <th>Pickup</th>
+            <th>Return</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td class="fw-semibold">
+                <a class="text-decoration-none" href="{{ url_for('admin_pickup_return.detail', booking_id=record.booking.id) }}">
+                  {{ record.booking.booking_number }}
+                </a>
+                <div class="text-secondary small">#{{ record.booking.id }} · {{ record.booking.status }}</div>
+              </td>
+              <td>{{ record.booking.customer.user.first_name }} {{ record.booking.customer.user.last_name }}</td>
+              <td>{{ record.booking.car.make }} {{ record.booking.car.model }}
+                <div class="text-secondary small">{{ record.booking.car.license_plate }}</div>
+              </td>
+              <td>
+                {{ record.booking.pickup_datetime.strftime("%Y-%m-%d %H:%M") }}
+                <div class="text-secondary small">{{ record.booking.pickup_branch.name }}</div>
+              </td>
+              <td>
+                {% if record.booking.actual_return_datetime %}
+                  {{ record.booking.actual_return_datetime.strftime("%Y-%m-%d %H:%M") }}
+                {% else %}
+                  {{ record.booking.return_datetime.strftime("%Y-%m-%d %H:%M") }}
+                  <div class="text-secondary small">expected</div>
+                {% endif %}
+                <div class="text-secondary small">{{ record.booking.return_branch.name }}</div>
+              </td>
+              <td>
+                {% if record.state == 'ready_for_pickup' %}<span class="badge text-bg-warning">Ready for pickup</span>
+                {% elif record.state == 'picked_up' %}<span class="badge text-bg-info">Picked up</span>
+                {% elif record.state == 'returned' %}<span class="badge text-bg-success">Returned</span>
+                {% else %}<span class="badge text-bg-secondary">Not applicable</span>{% endif %}
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_pickup_return.detail', booking_id=record.booking.id) }}" title="View"><i class="bi bi-eye"></i></a>
+                {% if record.can_pickup %}
+                  <a class="btn btn-sm btn-outline-success" href="{{ url_for('admin_pickup_return.pickup', booking_id=record.booking.id) }}" title="Record pickup"><i class="bi bi-box-arrow-in-right"></i></a>
+                {% endif %}
+                {% if record.can_return %}
+                  <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_pickup_return.return_record', booking_id=record.booking.id) }}" title="Record return"><i class="bi bi-box-arrow-left"></i></a>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-secondary py-5">
+                <i class="bi bi-arrow-left-right fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if search_term or state_filter %}
+                  No pickup/return records match your filters.
+                {% else %}
+                  No bookings yet. Pickup and return records appear here once a booking is created.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

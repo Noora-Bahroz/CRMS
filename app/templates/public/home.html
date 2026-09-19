@@ -1,0 +1,276 @@
+{% extends "public/base.html" %}
+{% from "public/_car_card.html" import car_card %}
+
+{% block title %}CRMS — Premium Car Rental{% endblock %}
+
+{% block content %}
+
+{# ------------------------------------------------------------------ Hero #}
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow eyebrow-lime">Premium car rental</span>
+        <h1 class="display-heading">Luxury Car Rental,<br>Made Simple</h1>
+        <p class="mb-0">
+          Choose from a maintained fleet of economy, sedan, SUV and luxury
+          vehicles. Transparent daily rates, flexible pickup branches, and a
+          reservation process that takes minutes.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-dark-pill btn-lg" href="{{ url_for('cars.index') }}">
+            <i class="bi bi-key me-2"></i>Rent a Car
+          </a>
+          <a class="btn btn-outline-teal btn-lg" href="{{ url_for('cars.index') }}">
+            Browse the fleet
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-value">{{ featured_cars|length }}+</div>
+            <div class="stat-label">Vehicles ready</div>
+          </div>
+          <div>
+            <div class="stat-value">{{ categories|length }}</div>
+            <div class="stat-label">Vehicle classes</div>
+          </div>
+          <div>
+            <div class="stat-value">{{ branches|length }}</div>
+            <div class="stat-label">Pickup branches</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <span class="hero-badge"><i class="bi bi-patch-check-fill me-1"></i>Premium Fleet</span>
+        <img src="{{ url_for('static', filename='img/car-hero.svg') }}"
+             alt="Premium rental vehicle">
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ----------------------------------------------------------- Search panel #}
+<div class="container search-panel">
+  <div class="search-card">
+    <form method="get" action="{{ url_for('cars.index') }}" data-range-form>
+      <div class="search-grid">
+        <div class="search-field">
+          <label for="home-pickup-branch">Pickup location</label>
+          <select class="form-select" id="home-pickup-branch" name="branch">
+            <option value="">Any branch</option>
+            {% for branch in branches %}
+              <option value="{{ branch.id }}">{{ branch.name }} — {{ branch.city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="search-field">
+          <label for="home-pickup-date">Pickup date &amp; time</label>
+          <input type="datetime-local" class="form-control" id="home-pickup-date"
+                 name="pickup_datetime">
+        </div>
+        <div class="search-field">
+          <label for="home-return-branch">Return location</label>
+          <select class="form-select" id="home-return-branch" name="return_branch">
+            <option value="">Same as pickup</option>
+            {% for branch in branches %}
+              <option value="{{ branch.id }}">{{ branch.name }} — {{ branch.city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="search-field">
+          <label for="home-return-date">Return date &amp; time</label>
+          <input type="datetime-local" class="form-control" id="home-return-date"
+                 name="return_datetime">
+        </div>
+        <div class="search-submit">
+          <button class="btn btn-teal btn-lg w-100" type="submit">
+            <i class="bi bi-search me-1"></i>Rent Now
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ---------------------------------------------------------- Brands strip #}
+{% if makes %}
+<section class="brands-strip">
+  <div class="container">
+    <p class="label">Vehicle brands in our fleet</p>
+    <div class="brand-row">
+      {% for make in makes %}
+        <span class="brand-word">{{ make|upper }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ------------------------------------------------------------ Why choose #}
+<section class="section-pad">
+  <div class="container">
+    <div class="split">
+      <div>
+        <span class="eyebrow">Why choose CRMS</span>
+        <h2 class="section-title mt-2 mb-3">A better way to rent a car</h2>
+        <p class="mb-0">
+          We keep every vehicle serviced, publish our rates up front, and staff
+          each branch with people who know the cars. No hidden fees, no
+          guesswork — just a straightforward rental.
+        </p>
+
+        <div class="feature-line">
+          <div class="feature-ico"><i class="bi bi-shield-check"></i></div>
+          <div>
+            <strong class="d-block">Safety-first fleet</strong>
+            <span class="small">Regular servicing and inspections keep every car road-ready.</span>
+          </div>
+        </div>
+        <div class="feature-line">
+          <div class="feature-ico"><i class="bi bi-tags"></i></div>
+          <div>
+            <strong class="d-block">Transparent pricing</strong>
+            <span class="small">Published daily, weekly and monthly rates with clear deposits.</span>
+          </div>
+        </div>
+        <div class="feature-line">
+          <div class="feature-ico"><i class="bi bi-headset"></i></div>
+          <div>
+            <strong class="d-block">Real support</strong>
+            <span class="small">Branch teams help you collect and return with ease.</span>
+          </div>
+        </div>
+
+        <a class="btn btn-teal mt-4" href="{{ url_for('public.about') }}">
+          Learn more <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="split-visual">
+        <div class="split-image">
+          <img src="{{ url_for('static', filename='img/car-hero.svg') }}"
+               alt="CRMS premium vehicle">
+        </div>
+        <div class="split-badge">
+          <div class="ico"><i class="bi bi-award"></i></div>
+          <div>
+            <strong class="d-block" style="color: var(--ink);">Premium Fleet</strong>
+            <span class="small text-muted">Serviced &amp; inspected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ------------------------------------------------------ Featured fleet #}
+<section class="section-pad bg-soft">
+  <div class="container">
+    <div class="fleet-head">
+      <span class="eyebrow">Our fleet</span>
+      <h2 class="section-title mt-2 mb-2">Pick Your Dream Car</h2>
+      <p class="mb-0 text-muted-2">Real vehicles from our current availability.</p>
+    </div>
+
+    <div class="fleet-track" id="fleetTrack">
+      {% for car in featured_cars %}
+        <div class="fleet-slide">{{ car_card(car) }}</div>
+      {% else %}
+        <div class="w-100 text-center text-muted py-5">
+          Our fleet is being updated. Please check back shortly.
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if featured_cars %}
+      <div class="fleet-carousel-nav mt-2">
+        <button class="carousel-btn" type="button" data-carousel="prev"
+                data-target="fleetTrack" aria-label="Previous cars">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="carousel-btn" type="button" data-carousel="next"
+                data-target="fleetTrack" aria-label="Next cars">
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{# -------------------------------------------------------- Promo banner #}
+<section class="section-pad">
+  <div class="container">
+    <div class="promo-banner">
+      <div class="content">
+        <span class="eyebrow text-crms-lime">Premium Fleet Collection</span>
+        <h2 class="section-title mt-2 mb-3">Drive something exceptional</h2>
+        <p class="mb-3" style="color: rgba(255,255,255,0.75); max-width: 26rem;">
+          Our top-tier vehicles combine comfort, style and performance for
+          business trips and special occasions.
+        </p>
+        {% if min_rate %}
+          <div class="price-tag mb-3">
+            From PKR {{ '{:,.0f}'.format(min_rate) }} <span style="font-size:1rem;color:rgba(255,255,255,0.7);">/ day</span>
+          </div>
+        {% endif %}
+        <a class="btn btn-lime btn-lg" href="{{ url_for('cars.index') }}">
+          Explore the fleet
+        </a>
+      </div>
+      <div class="promo-visual">
+        <img src="{{ url_for('static', filename='img/car-hero.svg') }}"
+             alt="Featured vehicle">
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------------------------------------------------------- Categories #}
+<section class="section-pad bg-soft">
+  <div class="container">
+    <div class="fleet-head">
+      <span class="eyebrow">Vehicle classes</span>
+      <h2 class="section-title mt-2 mb-0">Check Wide Range of Vehicles</h2>
+    </div>
+
+    <div class="category-grid">
+      {% for category in categories %}
+        <a class="category-card text-decoration-none"
+           href="{{ url_for('cars.index', category=category.id) }}">
+          <div class="d-flex justify-content-between align-items-start position-relative" style="z-index:2;">
+            <div>
+              <div class="cat-name">{{ category.name }}</div>
+              <div class="cat-count">
+                {{ category_counts.get(category.id, 0) }}
+                {{ 'car' if category_counts.get(category.id, 0) == 1 else 'cars' }}
+                · from PKR {{ '{:,.0f}'.format(category.daily_rate) }}/day
+              </div>
+            </div>
+          </div>
+          <img class="cat-img" src="{{ url_for('static', filename='img/car-placeholder.svg') }}" alt="">
+          <span class="cat-arrow mt-3"><i class="bi bi-arrow-up-right"></i></span>
+        </a>
+      {% else %}
+        <div class="text-center text-muted py-5">No categories available right now.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ------------------------------------------------------------- CTA band #}
+<section class="pb-5">
+  <div class="container">
+    <div class="cta-band">
+      <h2 class="section-title mb-2">Ready to hit the road?</h2>
+      <p class="mb-4" style="color: rgba(255,255,255,0.72);">
+        Explore the full fleet and reserve the car that fits your journey.
+      </p>
+      <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <a class="btn btn-lime btn-lg" href="{{ url_for('cars.index') }}">Browse all cars</a>
+        <a class="btn btn-outline-light-2 btn-lg" href="{{ url_for('public.contact') }}">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

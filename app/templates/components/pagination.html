@@ -1,0 +1,15 @@
+{% macro render_pagination(page, prev_url, next_url) -%}
+  {% if prev_url or next_url %}
+    <nav aria-label="Pagination">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {{ 'disabled' if not prev_url }}">
+          <a class="page-link" href="{{ prev_url or '#' }}">Previous</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">{{ page or 1 }}</span></li>
+        <li class="page-item {{ 'disabled' if not next_url }}">
+          <a class="page-link" href="{{ next_url or '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+{%- endmacro %}

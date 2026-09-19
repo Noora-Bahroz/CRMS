@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Premium vehicle illustration">
+  <defs>
+    <linearGradient id="hbody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#17736A"/>
+      <stop offset="0.55" stop-color="#0F4C45"/>
+      <stop offset="1" stop-color="#082622"/>
+    </linearGradient>
+    <linearGradient id="hglass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E4F6F2"/>
+      <stop offset="1" stop-color="#A9D5CD"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.55" r="0.55">
+      <stop offset="0" stop-color="#D7F24B" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#D7F24B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="360" cy="300" rx="300" ry="52" fill="url(#glow)"/>
+  <ellipse cx="330" cy="312" rx="250" ry="16" fill="#04120F" opacity="0.35"/>
+
+  <g stroke="#D7F24B" stroke-width="5" stroke-linecap="round" opacity="0.85">
+    <path d="M40 190h64"/>
+    <path d="M64 214h52"/>
+    <path d="M28 238h44"/>
+  </g>
+
+  <path d="M120 250c0-14 12-22 30-22h44c16-44 66-68 134-68h126c68 0 118 24 134 68h58c18 0 30 8 30 22v16c0 11-9 18-22 18H142c-13 0-22-7-22-18z" fill="url(#hbody)"/>
+  <path d="M242 182c18-18 50-24 86-24h58v58H234z" fill="url(#hglass)"/>
+  <path d="M402 158h74c34 0 60 16 78 50h-152z" fill="url(#hglass)"/>
+  <path d="M300 236h96" stroke="#04120F" stroke-opacity="0.25" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="268" cy="286" r="46" fill="#0B1A17"/>
+  <circle cx="268" cy="286" r="20" fill="#E8EEEC"/>
+  <circle cx="268" cy="286" r="9" fill="#11574F"/>
+  <circle cx="520" cy="286" r="46" fill="#0B1A17"/>
+  <circle cx="520" cy="286" r="20" fill="#E8EEEC"/>
+  <circle cx="520" cy="286" r="9" fill="#11574F"/>
+  <rect x="584" y="232" width="46" height="16" rx="8" fill="#D7F24B"/>
+  <rect x="128" y="232" width="38" height="14" rx="7" fill="#F97316" opacity="0.9"/>
+</svg>

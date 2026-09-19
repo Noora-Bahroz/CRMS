@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if expense %}Edit{% else %}Record{% endif %} Expense{% endblock %}
+{% block page_title %}{% if expense %}Edit Expense{% else %}Record Expense{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-cash-stack me-2 text-secondary"></i>{{ 'Edit Expense' if expense else 'Record Expense' }}
+          {% if expense %}<span class="text-secondary ms-2"><code>#{{ expense.id }}</code></span>{% endif %}
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="category">Category</label>
+                <select class="form-select" id="category" name="category">
+                  {% for category in categories %}
+                    <option value="{{ category }}" {{ 'selected' if form.get('category') == category }}>{{ category|replace('_', ' ')|upper }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="amount">Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="amount" name="amount" type="number" step="0.01" min="0.01"
+                         value="{{ form.get('amount', '') }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="expense_date">Expense Date</label>
+                <input class="form-control" id="expense_date" name="expense_date" type="date"
+                       value="{{ form.get('expense_date', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="recorded_by">Recorded By</label>
+                <input class="form-control" id="recorded_by" name="recorded_by"
+                       value="{{ form.get('recorded_by', '') }}">
+              </div>
+
+              <div class="col-12 mt-4">
+                <h6 class="text-uppercase text-secondary small fw-semibold mb-0">Cost Context <span class="text-secondary fw-normal">(select at least one)</span></h6>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="branch_id">Branch</label>
+                <select class="form-select" id="branch_id" name="branch_id">
+                  <option value="">— None —</option>
+                  {% for branch in branches %}
+                    <option value="{{ branch.id }}" {{ 'selected' if form.get('branch_id')|int == branch.id }}>{{ branch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="car_id">Car</label>
+                <select class="form-select" id="car_id" name="car_id">
+                  <option value="">— None —</option>
+                  {% for car in cars %}
+                    <option value="{{ car.id }}" {{ 'selected' if form.get('car_id')|int == car.id }}>
+                      {{ car.make }} {{ car.model }} · {{ car.license_plate }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="maintenance_id">Maintenance</label>
+                <select class="form-select" id="maintenance_id" name="maintenance_id">
+                  <option value="">— None —</option>
+                  {% for record in maintenance_records %}
+                    <option value="{{ record.id }}" {{ 'selected' if form.get('maintenance_id')|int == record.id }}>
+                      #{{ record.id }} · {{ record.maintenance_type|replace('_', ' ') }} · {{ record.car.license_plate }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-12 mt-4">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="2" required>{{ form.get('description', '') }}</textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="receipt_url">Receipt URL <span class="text-secondary fw-normal">(optional)</span></label>
+                <input class="form-control" id="receipt_url" name="receipt_url" type="url"
+                       value="{{ form.get('receipt_url', '') }}">
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary"
+                 href="{{ url_for('admin_expenses.detail', expense_id=expense.id) if expense else url_for('admin_expenses.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

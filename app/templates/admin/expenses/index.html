@@ -1,0 +1,89 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Expenses{% endblock %}
+{% block page_title %}Expenses{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Expenses</h2>
+      <p class="text-secondary small mb-0">Operational and fleet expenses.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_expenses.new') }}"><i class="bi bi-plus-lg me-1"></i>Record Expense</a>
+  </div>
+
+  <form class="mb-3 row g-2" method="get" action="{{ url_for('admin_expenses.index') }}" role="search">
+    <div class="col-auto input-group" style="max-width: 420px;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input class="form-control" type="search" name="q" placeholder="Search category, branch, description…"
+             value="{{ search_term }}" aria-label="Search expenses">
+    </div>
+    <div class="col-auto">
+      <select class="form-select" name="category" aria-label="Filter by category">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category }}" {{ 'selected' if category == category_filter }}>{{ category|replace('_', ' ')|upper }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" type="submit">Filter</button>
+      {% if search_term or category_filter %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_expenses.index') }}" title="Clear">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Branch</th>
+            <th>Car</th>
+            <th>Date</th>
+            <th class="text-end">Amount</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expense in expenses %}
+            <tr>
+              <td><span class="badge text-bg-light border text-uppercase">{{ expense.category|replace('_', ' ') }}</span></td>
+              <td class="fw-semibold">
+                <a class="text-decoration-none" href="{{ url_for('admin_expenses.detail', expense_id=expense.id) }}">
+                  {{ expense.description|truncate(45) }}
+                </a>
+              </td>
+              <td>{{ expense.branch.name if expense.branch else '—' }}</td>
+              <td>{{ expense.car.license_plate if expense.car else '—' }}</td>
+              <td>{{ expense.expense_date.strftime("%Y-%m-%d") }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(expense.amount) }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_expenses.detail', expense_id=expense.id) }}" title="View"><i class="bi bi-eye"></i></a>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_expenses.edit', expense_id=expense.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{{ url_for('admin_expenses.delete', expense_id=expense.id) }}"
+                      onsubmit="return confirm('Delete this expense?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-secondary py-5">
+                <i class="bi bi-cash-stack fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if search_term or category_filter %}
+                  No expenses match your filters.
+                {% else %}
+                  No expenses yet. Record your first expense to get started.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

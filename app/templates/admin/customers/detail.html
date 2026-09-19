@@ -1,0 +1,93 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Customer · {{ customer.user.first_name }} {{ customer.user.last_name }}{% endblock %}
+{% block page_title %}Customer Details{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">{{ customer.user.first_name }} {{ customer.user.last_name }}</h2>
+      <p class="text-secondary small mb-0">{{ customer.user.email }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{{ url_for('admin_customers.edit', customer_id=customer.id) }}"><i class="bi bi-pencil me-1"></i>Edit</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_customers.index') }}">Back</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-person-vcard me-2 text-secondary"></i>Customer Profile</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-secondary small">Driver license number</div>
+              <div>{{ customer.driver_license_number }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">License expiry</div>
+              <div>{{ customer.driver_license_expiry.strftime("%Y-%m-%d") }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Date of birth</div>
+              <div>{{ customer.date_of_birth.strftime("%Y-%m-%d") if customer.date_of_birth else '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">City</div>
+              <div>{{ customer.city or '—' }}{% if customer.state %}, {{ customer.state }}{% endif %}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Address</div>
+              <div>{{ customer.address or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Zip code</div>
+              <div>{{ customer.zip_code or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Emergency contact</div>
+              <div>{{ customer.emergency_contact_name or '—' }}{% if customer.emergency_contact_phone %} · {{ customer.emergency_contact_phone }}{% endif %}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Notes</div>
+              <div>{{ customer.notes or '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-person-badge me-2 text-secondary"></i>Login Account</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="text-secondary small">Username</div>
+              <div>{{ customer.user.username }}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Phone</div>
+              <div>{{ customer.user.phone or '—' }}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Status</div>
+              <span class="badge {{ 'text-bg-success' if customer.user.is_active else 'text-bg-secondary' }}">
+                {{ 'Active' if customer.user.is_active else 'Inactive' }}
+              </span>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Bookings</div>
+              <span class="badge text-bg-light border">{{ customer.bookings|length }}</span>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Joined</div>
+              <div>{{ customer.created_at.strftime("%Y-%m-%d") }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

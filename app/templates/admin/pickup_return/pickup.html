@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Record Pickup · {{ booking.booking_number }}{% endblock %}
+{% block page_title %}Record Pickup{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card mb-4">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-box-arrow-in-right me-2 text-secondary"></i>Booking
+          <span class="text-secondary ms-2"><code>{{ booking.booking_number }}</code></span>
+          <span class="badge text-bg-primary ms-1">confirmed</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="text-secondary small">Customer</div>
+              <div>{{ booking.customer.user.first_name }} {{ booking.customer.user.last_name }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-secondary small">Car</div>
+              <div>{{ booking.car.make }} {{ booking.car.model }} ({{ booking.car.license_plate }})</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-secondary small">Pickup branch</div>
+              <div>{{ booking.pickup_branch.name }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Scheduled pickup</div>
+              <div>{{ booking.pickup_datetime.strftime("%Y-%m-%d %H:%M") }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Expected return</div>
+              <div>{{ booking.return_datetime.strftime("%Y-%m-%d %H:%M") }} · {{ booking.return_branch.name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-arrow-repeat me-2 text-secondary"></i>Vehicle condition at pickup
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="pickup_mileage">Pickup mileage (km)</label>
+                <input class="form-control" id="pickup_mileage" name="pickup_mileage" type="number" min="0" step="1"
+                       value="{{ form.get('pickup_mileage', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="fuel_level_pickup">Fuel level at pickup (%)</label>
+                <input class="form-control" id="fuel_level_pickup" name="fuel_level_pickup" type="number" min="0" max="100" step="0.01"
+                       value="{{ form.get('fuel_level_pickup', '') }}" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ form.get('notes', '') }}</textarea>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-success" type="submit"><i class="bi bi-check-lg me-1"></i>Confirm Pickup</button>
+              <a class="btn btn-outline-secondary" href="{{ url_for('admin_pickup_return.detail', booking_id=booking.id) }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

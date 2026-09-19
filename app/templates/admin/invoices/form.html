@@ -1,0 +1,98 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if invoice %}Edit{% else %}New{% endif %} Invoice{% endblock %}
+{% block page_title %}{% if invoice %}Edit Invoice{% else %}New Invoice{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-receipt me-2 text-secondary"></i>{{ 'Edit Invoice' if invoice else 'New Invoice' }}
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="booking_id">Booking</label>
+                <select class="form-select" id="booking_id" name="booking_id" required>
+                  <option value="">Select booking…</option>
+                  {% for booking in bookings %}
+                    <option value="{{ booking.id }}" {{ 'selected' if form.get('booking_id')|int == booking.id }}>
+                      {{ booking.booking_number }} · {{ booking.customer.user.first_name }} {{ booking.customer.user.last_name }} · Rs {{ '%.0f'|format(booking.total_amount) }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="invoice_number">Invoice Number</label>
+                <input class="form-control" id="invoice_number" name="invoice_number"
+                       value="{{ form.get('invoice_number', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="subtotal">Subtotal</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="subtotal" name="subtotal" type="number" step="0.01" min="0"
+                         value="{{ form.get('subtotal', '') }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="tax_amount">Tax Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="tax_amount" name="tax_amount" type="number" step="0.01" min="0"
+                         value="{{ form.get('tax_amount', '0.00') }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="discount_amount">Discount Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="discount_amount" name="discount_amount" type="number" step="0.01" min="0"
+                         value="{{ form.get('discount_amount', '0.00') }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="due_date">Due Date</label>
+                <input class="form-control" id="due_date" name="due_date" type="date"
+                       value="{{ form.get('due_date', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="paid_date">Paid Date <span class="text-secondary fw-normal">(optional)</span></label>
+                <input class="form-control" id="paid_date" name="paid_date" type="date"
+                       value="{{ form.get('paid_date', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" name="status">
+                  {% for status in statuses %}
+                    <option value="{{ status }}" {{ 'selected' if form.get('status') == status }}>{{ status|upper }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ form.get('notes', '') }}</textarea>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary"
+                 href="{{ url_for('admin_invoices.detail', invoice_id=invoice.id) if invoice else url_for('admin_invoices.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{# Shared invoice / payment status pills, reusing the public website pill styles. #}
+
+{% macro invoice_status(status) -%}
+  {% set classes = {
+    'paid': 'pill-available',
+    'pending': 'pill-rented',
+    'overdue': 'pill-oos',
+    'cancelled': 'pill-light'
+  } %}
+  <span class="pill {{ classes.get(status, 'pill-light') }}">
+    {{ status|replace('_', ' ')|title }}
+  </span>
+{%- endmacro %}
+
+{% macro payment_status(status) -%}
+  {% set classes = {
+    'completed': 'pill-available',
+    'pending': 'pill-rented',
+    'failed': 'pill-oos',
+    'refunded': 'pill-light'
+  } %}
+  <span class="pill {{ classes.get(status, 'pill-light') }}">
+    {{ status|replace('_', ' ')|title }}
+  </span>
+{%- endmacro %}

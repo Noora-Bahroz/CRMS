@@ -1,0 +1,156 @@
+{% extends "public/base.html" %}
+
+{% block title %}About Us — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">About</li>
+      </ol>
+    </nav>
+    <span class="eyebrow text-crms-lime">About CRMS</span>
+    <h1 class="fw-bold mt-2 mb-2">Reliable car rental, managed properly</h1>
+    <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+      A modern rental operation built around a well-maintained fleet and
+      transparent pricing.
+    </p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="split">
+      <div>
+        <span class="eyebrow">Our story</span>
+        <h2 class="section-title mt-2 mb-3">Driven by service, not surprises</h2>
+        <p>
+          CRMS began as a small branch operation with a simple goal: make
+          renting a car straightforward. Every vehicle in our fleet is serviced
+          on schedule, every rate is published up front, and every branch is
+          staffed by people who know the cars.
+        </p>
+        <p class="mb-0">
+          Today we serve individuals, families and businesses across our branch
+          network — with the same focus on clear pricing and cars you can
+          depend on.
+        </p>
+      </div>
+      <div class="split-visual">
+        <div class="split-image">
+          <img src="{{ url_for('static', filename='img/car-hero.svg') }}" alt="CRMS fleet">
+        </div>
+        <div class="split-badge">
+          <div class="ico"><i class="bi bi-people"></i></div>
+          <div>
+            <strong class="d-block" style="color: var(--ink);">Customer first</strong>
+            <span class="small text-muted">Here to help, every trip</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad bg-soft">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-lg-3">
+        <div class="h-100 p-4 bg-white rounded-4 border">
+          <div class="stat-value" style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--ink);">
+            {{ branches|length }}
+          </div>
+          <div class="text-muted-2 small">Pickup branches</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="h-100 p-4 bg-white rounded-4 border">
+          <div class="stat-value" style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--ink);">100%</div>
+          <div class="text-muted-2 small">Serviced fleet</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="h-100 p-4 bg-white rounded-4 border">
+          <div class="stat-value" style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--ink);">24/7</div>
+          <div class="text-muted-2 small">Roadside support</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="h-100 p-4 bg-white rounded-4 border">
+          <div class="stat-value" style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--ink);">5</div>
+          <div class="text-muted-2 small">Vehicle classes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="fleet-head">
+      <span class="eyebrow">Why choose us</span>
+      <h2 class="section-title mt-2 mb-0">Built around the customer</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 bg-white border rounded-4 h-100">
+          <div class="feature-ico mb-3"><i class="bi bi-shield-check"></i></div>
+          <h5 class="fw-bold">Safety first</h5>
+          <p class="text-muted-2 small mb-0">Regular servicing and inspections keep every car road-ready.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 bg-white border rounded-4 h-100">
+          <div class="feature-ico mb-3"><i class="bi bi-tags"></i></div>
+          <h5 class="fw-bold">Honest pricing</h5>
+          <p class="text-muted-2 small mb-0">Published daily, weekly and monthly rates with clear deposits.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 bg-white border rounded-4 h-100">
+          <div class="feature-ico mb-3"><i class="bi bi-people"></i></div>
+          <h5 class="fw-bold">Real support</h5>
+          <p class="text-muted-2 small mb-0">Friendly branch teams help you collect and return with ease.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 bg-white border rounded-4 h-100">
+          <div class="feature-ico mb-3"><i class="bi bi-car-front"></i></div>
+          <h5 class="fw-bold">Choice of cars</h5>
+          <p class="text-muted-2 small mb-0">From economy runabouts to spacious SUVs and luxury sedans.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad bg-soft">
+  <div class="container">
+    <div class="fleet-head">
+      <span class="eyebrow">Find us</span>
+      <h2 class="section-title mt-2 mb-0">Our branches</h2>
+    </div>
+    <div class="row g-4 justify-content-center">
+      {% for branch in branches %}
+        <div class="col-md-6 col-lg-5">
+          <div class="p-4 bg-white border rounded-4 h-100">
+            <h5 class="fw-bold mb-1">
+              <i class="bi bi-geo-alt text-crms-teal me-1"></i>{{ branch.name }}
+            </h5>
+            <p class="text-muted-2 small mb-2">{{ branch.city }}{% if branch.state %}, {{ branch.state }}{% endif %}</p>
+            <ul class="list-unstyled small text-muted-2 mb-0">
+              {% if branch.address %}<li>{{ branch.address }}</li>{% endif %}
+              {% if branch.phone %}<li><i class="bi bi-telephone me-1"></i>{{ branch.phone }}</li>{% endif %}
+              {% if branch.email %}<li><i class="bi bi-envelope me-1"></i>{{ branch.email }}</li>{% endif %}
+            </ul>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12 text-center text-muted-2"><p>Branch details coming soon.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

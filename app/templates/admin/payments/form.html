@@ -1,0 +1,85 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if payment %}Edit{% else %}Record{% endif %} Payment{% endblock %}
+{% block page_title %}{% if payment %}Edit Payment{% else %}Record Payment{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-credit-card me-2 text-secondary"></i>{{ 'Edit Payment' if payment else 'Record Payment' }}
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="booking_id">Booking</label>
+                <select class="form-select" id="booking_id" name="booking_id" required>
+                  <option value="">Select booking…</option>
+                  {% for booking in bookings %}
+                    <option value="{{ booking.id }}" {{ 'selected' if form.get('booking_id')|int == booking.id }}>
+                      {{ booking.booking_number }} · {{ booking.customer.user.first_name }} {{ booking.customer.user.last_name }} · Rs {{ '%.0f'|format(booking.total_amount) }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="amount">Amount</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="amount" name="amount" type="number" step="0.01" min="0.01"
+                         value="{{ form.get('amount', '') }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="method">Payment Method</label>
+                <select class="form-select" id="method" name="method">
+                  {% for method in methods %}
+                    <option value="{{ method }}" {{ 'selected' if form.get('method') == method }}>{{ method|replace('_', ' ')|upper }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="status">Payment Status</label>
+                <select class="form-select" id="status" name="status">
+                  {% for status in statuses %}
+                    <option value="{{ status }}" {{ 'selected' if form.get('status') == status }}>{{ status|upper }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reference_number">Reference Number</label>
+                <input class="form-control" id="reference_number" name="reference_number"
+                       value="{{ form.get('reference_number', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="received_by">Received By</label>
+                <input class="form-control" id="received_by" name="received_by"
+                       value="{{ form.get('received_by', '') }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ form.get('notes', '') }}</textarea>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary"
+                 href="{{ url_for('admin_payments.detail', payment_id=payment.id) if payment else url_for('admin_payments.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Branches{% endblock %}
+{% block page_title %}Branches{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Branches</h2>
+      <p class="text-secondary small mb-0">Physical rental locations serving your fleet.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_branches.new') }}"><i class="bi bi-plus-lg me-1"></i>Add Branch</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>City</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Cars</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for branch in branches %}
+            <tr>
+              <td class="fw-semibold">{{ branch.name }}</td>
+              <td>{{ branch.city }}{% if branch.state %}, {{ branch.state }}{% endif %}</td>
+              <td>{{ branch.phone or '—' }}</td>
+              <td>{{ branch.email or '—' }}</td>
+              <td>
+                <span class="badge text-bg-light border">{{ branch.cars|length }}</span>
+              </td>
+              <td>
+                <span class="badge {{ 'text-bg-success' if branch.is_active else 'text-bg-secondary' }}">
+                  {{ 'Active' if branch.is_active else 'Inactive' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_branches.edit', branch_id=branch.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{{ url_for('admin_branches.delete', branch_id=branch.id) }}"
+                      onsubmit="return confirm('Delete branch &quot;{{ branch.name }}&quot;?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-secondary py-5">
+                <i class="bi bi-building fs-1 d-block mb-2 text-body-tertiary"></i>
+                No branches yet. Add your first branch to get started.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

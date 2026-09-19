@@ -1,0 +1,102 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Rental Agreements{% endblock %}
+{% block page_title %}Rental Agreements{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Rental Agreements</h2>
+      <p class="text-secondary small mb-0">Signed rental agreements linked to bookings.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_agreements.new') }}"><i class="bi bi-plus-lg me-1"></i>New Agreement</a>
+  </div>
+
+  <form class="mb-3 row g-2" method="get" action="{{ url_for('admin_agreements.index') }}" role="search">
+    <div class="col-auto input-group" style="max-width: 420px;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input class="form-control" type="search" name="q" placeholder="Search agreement or booking no…"
+             value="{{ search_term }}" aria-label="Search agreements">
+    </div>
+    <div class="col-auto">
+      <select class="form-select" name="status" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        {% for status in statuses %}
+          <option value="{{ status }}" {{ 'selected' if status == status_filter }}>{{ status|upper }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" type="submit">Filter</button>
+      {% if search_term or status_filter %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_agreements.index') }}" title="Clear">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Agreement</th>
+            <th>Booking</th>
+            <th>Customer</th>
+            <th>Car</th>
+            <th>Status</th>
+            <th>Signed</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for agreement in agreements %}
+            <tr>
+              <td class="fw-semibold">
+                <a class="text-decoration-none" href="{{ url_for('admin_agreements.detail', agreement_id=agreement.id) }}">
+                  {{ agreement.agreement_number }}
+                </a>
+              </td>
+              <td>{{ agreement.booking.booking_number }}</td>
+              <td>{{ agreement.booking.customer.user.first_name }} {{ agreement.booking.customer.user.last_name }}</td>
+              <td>{{ agreement.booking.car.make }} {{ agreement.booking.car.model }}</td>
+              <td>
+                {% if agreement.status == 'active' %}<span class="badge text-bg-success">Active</span>
+                {% elif agreement.status == 'draft' %}<span class="badge text-bg-secondary">Draft</span>
+                {% elif agreement.status == 'completed' %}<span class="badge text-bg-info">Completed</span>
+                {% else %}<span class="badge text-bg-danger">Terminated</span>{% endif %}
+              </td>
+              <td>
+                {% if agreement.signed_by_customer and agreement.signed_by_staff %}
+                  <span class="badge text-bg-light border">Signed</span>
+                {% else %}
+                  <span class="text-secondary small">{{ '—' }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_agreements.detail', agreement_id=agreement.id) }}" title="View"><i class="bi bi-eye"></i></a>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_agreements.edit', agreement_id=agreement.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                {% if agreement.status != 'terminated' %}
+                  <form class="d-inline" method="post" action="{{ url_for('admin_agreements.delete', agreement_id=agreement.id) }}"
+                        onsubmit="return confirm('Terminate agreement {{ agreement.agreement_number }}?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit" title="Terminate"><i class="bi bi-x-lg"></i></button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-secondary py-5">
+                <i class="bi bi-file-earmark-text fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if search_term or status_filter %}
+                  No agreements match your filters.
+                {% else %}
+                  No agreements yet. Create your first agreement to get started.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

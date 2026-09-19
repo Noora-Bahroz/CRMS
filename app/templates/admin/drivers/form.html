@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if driver %}Edit{% else %}New{% endif %} Driver{% endblock %}
+{% block page_title %}{% if driver %}Edit Driver{% else %}Add Driver{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-person-vcard me-2 text-secondary"></i>{{ 'Edit' if driver else 'Add' }} Driver
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="first_name">First Name</label>
+                <input class="form-control" id="first_name" name="first_name" value="{{ form.get('first_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="last_name">Last Name</label>
+                <input class="form-control" id="last_name" name="last_name" value="{{ form.get('last_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="phone">Phone</label>
+                <input class="form-control" id="phone" name="phone" placeholder="e.g. +92 300 111 2222"
+                       value="{{ form.get('phone', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" name="email" type="email" value="{{ form.get('email', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="license_number">License Number</label>
+                <input class="form-control" id="license_number" name="license_number" placeholder="e.g. DRV-1004"
+                       value="{{ form.get('license_number', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="license_expiry">License Expiry</label>
+                <input class="form-control" id="license_expiry" name="license_expiry" type="date"
+                       value="{{ form.get('license_expiry', '') }}" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" name="status">
+                  {% for status in statuses %}
+                    <option value="{{ status }}" {{ 'selected' if form.get('status') == status }}>
+                      {{ status.replace('_', ' ') }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="daily_rate">Daily Rate (PKR)</label>
+                <input class="form-control" id="daily_rate" name="daily_rate" type="number" step="0.01" min="0"
+                       value="{{ form.get('daily_rate', '') }}" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="notes">Notes</label>
+                <input class="form-control" id="notes" name="notes" value="{{ form.get('notes', '') }}">
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary" href="{{ url_for('admin_drivers.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

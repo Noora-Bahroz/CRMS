@@ -1,0 +1,70 @@
+{% extends "public/base.html" %}
+{% from "bookings/_status.html" import booking_status %}
+
+{% block title %}Booking Confirmed — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow text-crms-lime">Step 3 of 3</span>
+    <h1 class="fw-bold mt-2 mb-0">Booking confirmed</h1>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="booking-aside text-center">
+          <div class="confirm-mark mx-auto mb-3">
+            <i class="bi bi-check-lg"></i>
+          </div>
+          <h3 class="fw-bold mb-1">Thank you, your car is reserved.</h3>
+          <p class="text-muted-2 mb-3">Your booking reference is</p>
+          <div class="confirm-number mb-4">{{ booking.booking_number }}</div>
+          <div>{{ booking_status(booking.status) }}</div>
+        </div>
+
+        <div class="row g-4 mt-1">
+          <div class="col-md-7">
+            <div class="filter-card h-100">
+              <h5 class="fw-bold mb-3">Rental details</h5>
+              <table class="spec-table mb-0">
+                <tbody>
+                  <tr><td>Car</td><td>{{ booking.car.make }} {{ booking.car.model }}</td></tr>
+                  <tr><td>Pickup location</td><td>{{ booking.pickup_branch.name }}</td></tr>
+                  <tr><td>Return location</td><td>{{ booking.return_branch.name }}</td></tr>
+                  <tr><td>Pickup date/time</td><td>{{ booking.pickup_datetime.strftime('%d %b %Y, %H:%M') }}</td></tr>
+                  <tr><td>Return date/time</td><td>{{ booking.return_datetime.strftime('%d %b %Y, %H:%M') }}</td></tr>
+                  <tr><td>Duration</td><td>{{ booking.estimated_days }} {{ 'day' if booking.estimated_days == 1 else 'days' }}</td></tr>
+                  {% if booking.driver %}
+                    <tr><td>Driver</td><td>{{ booking.driver.first_name }} {{ booking.driver.last_name }}</td></tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="filter-card h-100">
+              <h5 class="fw-bold mb-3">Total amount</h5>
+              <div class="detail-price mb-2">PKR {{ '{:,.2f}'.format(booking.total_amount) }}</div>
+              <p class="text-muted-2 small mb-0">
+                Payable at the branch when you collect the car. No online
+                payment is taken.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4 justify-content-center">
+          <a class="btn btn-teal" href="{{ url_for('customer.bookings') }}">
+            <i class="bi bi-journal-text me-1"></i>View my bookings
+          </a>
+          <a class="btn btn-outline-teal" href="{{ url_for('cars.index') }}">Return to fleet</a>
+          <a class="btn btn-outline-teal" href="{{ url_for('public.home') }}">Return home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Expense · #{{ expense.id }}{% endblock %}
+{% block page_title %}Expense Details{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">
+        Expense #{{ expense.id }}
+        <span class="badge text-bg-light border text-uppercase align-middle">{{ expense.category|replace('_', ' ') }}</span>
+      </h2>
+      <p class="text-secondary small mb-0">Recorded {{ expense.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{{ url_for('admin_expenses.edit', expense_id=expense.id) }}"><i class="bi bi-pencil me-1"></i>Edit</a>
+      <form method="post" action="{{ url_for('admin_expenses.delete', expense_id=expense.id) }}"
+            onsubmit="return confirm('Delete this expense?');">
+        <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash me-1"></i>Delete</button>
+      </form>
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_expenses.index') }}">Back</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-info-circle me-2 text-secondary"></i>Expense Information</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-secondary small">Amount</div>
+              <div class="fs-5 fw-semibold">Rs {{ '%.2f'|format(expense.amount) }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Expense date</div>
+              <div>{{ expense.expense_date.strftime("%Y-%m-%d") }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Recorded by</div>
+              <div>{{ expense.recorded_by or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Receipt URL</div>
+              <div>
+                {% if expense.receipt_url %}
+                  <a href="{{ expense.receipt_url }}" target="_blank" rel="noopener">{{ expense.receipt_url|truncate(40) }}</a>
+                {% else %}
+                  —
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Description</div>
+              <div>{{ expense.description }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-geo-alt me-2 text-secondary"></i>Linked References</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="text-secondary small">Branch</div>
+              <div>{{ expense.branch.name if expense.branch else '—' }}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Car</div>
+              {% if expense.car %}
+                <div>{{ expense.car.make }} {{ expense.car.model }} ({{ expense.car.license_plate }})</div>
+              {% else %}
+                <div>—</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Maintenance</div>
+              {% if expense.maintenance %}
+                <a class="text-decoration-none" href="{{ url_for('admin_maintenance.detail', maintenance_id=expense.maintenance.id) }}">
+                  #{{ expense.maintenance.id }} · {{ expense.maintenance.maintenance_type|replace('_', ' ') }} · {{ expense.maintenance.car.license_plate }}
+                </a>
+              {% else %}
+                <div>—</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

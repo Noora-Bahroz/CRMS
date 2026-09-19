@@ -1,0 +1,108 @@
+{% extends "public/base.html" %}
+
+{% block title %}Create Account — CRMS{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="auth-card">
+          <span class="eyebrow">Get started</span>
+          <h3 class="fw-bold mt-2 mb-1">Create your account</h3>
+          <p class="text-muted-2 small mb-4">
+            Register to reserve vehicles. Fields marked with
+            <span class="text-danger">*</span> are required.
+          </p>
+
+          {% if errors %}
+            <div class="alert alert-danger py-2">
+              {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('public.register') }}" novalidate>
+            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+            <h6 class="fw-bold text-uppercase small text-muted-2 mb-3">Personal details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="reg-first">First name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-first" name="first_name"
+                       value="{{ form.get('first_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-last">Last name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-last" name="last_name"
+                       value="{{ form.get('last_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-email">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="reg-email" name="email"
+                       value="{{ form.get('email', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-phone">Phone</label>
+                <input type="text" class="form-control" id="reg-phone" name="phone"
+                       value="{{ form.get('phone', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-dob">Date of birth</label>
+                <input type="date" class="form-control" id="reg-dob" name="date_of_birth"
+                       value="{{ form.get('date_of_birth', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-city">City</label>
+                <input type="text" class="form-control" id="reg-city" name="city"
+                       value="{{ form.get('city', '') }}">
+              </div>
+            </div>
+
+            <h6 class="fw-bold text-uppercase small text-muted-2 mt-4 mb-3">Driving licence</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="reg-license">Licence number <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-license"
+                       name="driver_license_number"
+                       value="{{ form.get('driver_license_number', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-expiry">Licence expiry <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="reg-expiry"
+                       name="driver_license_expiry"
+                       value="{{ form.get('driver_license_expiry', '') }}" required>
+              </div>
+            </div>
+
+            <h6 class="fw-bold text-uppercase small text-muted-2 mt-4 mb-3">Account</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="reg-username">Username <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-username" name="username"
+                       value="{{ form.get('username', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-password">Password <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="reg-password" name="password"
+                       minlength="6" required>
+                <div class="form-text">At least 6 characters.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="reg-confirm">Confirm password <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="reg-confirm"
+                       name="confirm_password" minlength="6" required>
+              </div>
+            </div>
+
+            <button class="btn btn-teal btn-lg w-100 mt-4" type="submit">Create account</button>
+          </form>
+
+          <p class="text-center text-muted-2 small mt-4 mb-0">
+            Already registered?
+            <a href="{{ url_for('public.login', next=next_url) }}">Sign in</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

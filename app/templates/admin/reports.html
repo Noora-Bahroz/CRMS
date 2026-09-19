@@ -1,0 +1,457 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+  {% set booking_status_colors = {
+    'pending': 'text-bg-warning',
+    'confirmed': 'text-bg-primary',
+    'ongoing': 'text-bg-info',
+    'completed': 'text-bg-success',
+    'cancelled': 'text-bg-danger',
+  } %}
+  {% set car_status_colors = {
+    'available': 'text-bg-success',
+    'rented': 'text-bg-info',
+    'maintenance': 'text-bg-warning',
+    'out_of_service': 'text-bg-danger',
+  } %}
+
+  <form class="card card-body mb-4" method="get" action="{{ url_for('admin_reports.index') }}">
+    <div class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label class="form-label small mb-1" for="from">From date</label>
+        <input class="form-control" type="date" id="from" name="from" value="{{ from_raw }}">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1" for="to">To date</label>
+        <input class="form-control" type="date" id="to" name="to" value="{{ to_raw }}">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1" for="status">Booking status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="">All statuses</option>
+          {% for status in booking_statuses %}
+            <option value="{{ status }}" {{ 'selected' if status == status_filter }}>{{ status|upper }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1" for="category">Expense category</label>
+        <select class="form-select" id="category" name="category">
+          <option value="">All categories</option>
+          {% for category in expense_categories %}
+            <option value="{{ category }}" {{ 'selected' if category == category_filter }}>{{ category|replace('_', ' ')|upper }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small mb-1" for="branch">Branch</label>
+        <select class="form-select" id="branch" name="branch">
+          <option value="">All branches</option>
+          {% for branch in branches %}
+            <option value="{{ branch.id }}" {{ 'selected' if branch.id|string == branch_filter }}>{{ branch.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Apply</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_reports.index') }}" title="Clear filters">Clear</a>
+      </div>
+      <div class="col-12">
+        <div class="form-text">
+          The date range filters bookings by pickup date, revenue by payment date, and expenses by expense date;
+          status/category/branch refine the matching sections.
+        </div>
+      </div>
+    </div>
+  </form>
+
+  {% if date_error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ date_error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+
+  <h2 class="h5 mb-3">Summary</h2>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-info"><i class="bi bi-calendar-check-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ "{:,.0f}".format(stats.total_bookings) }}</div>
+            <div class="stat-label">Total Bookings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-success"><i class="bi bi-check-circle-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ "{:,.0f}".format(stats.completed_bookings) }}</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-danger"><i class="bi bi-x-circle-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ "{:,.0f}".format(stats.cancelled_bookings) }}</div>
+            <div class="stat-label">Cancelled</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-success"><i class="bi bi-currency-rupee"></i></div>
+          <div>
+            <div class="stat-value">Rs {{ "{:,.0f}".format(stats.revenue) }}</div>
+            <div class="stat-label">Total Revenue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-danger"><i class="bi bi-cash-stack"></i></div>
+          <div>
+            <div class="stat-value">Rs {{ "{:,.0f}".format(stats.expenses) }}</div>
+            <div class="stat-label">Total Expenses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-primary"><i class="bi bi-diagram-3-fill"></i></div>
+          <div>
+            <div class="stat-value {{ 'text-success' if stats.net >= 0 else 'text-danger' }}">Rs {{ "{:,.0f}".format(stats.net) }}</div>
+            <div class="stat-label">Net (Revenue − Expenses)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-primary"><i class="bi bi-car-front-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ "{:,.0f}".format(stats.active_cars) }}</div>
+            <div class="stat-label">Active Cars <span class="text-secondary small">of {{ "{:,.0f}".format(stats.total_cars) }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon text-warning"><i class="bi bi-tools"></i></div>
+          <div>
+            <div class="stat-value">Rs {{ "{:,.0f}".format(stats.maintenance_cost) }}</div>
+            <div class="stat-label">Maintenance Cost <span class="text-secondary small">{{ "{:,.0f}".format(stats.maintenance_count) }} completed</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header fw-semibold"><i class="bi bi-pie-chart me-2 text-secondary"></i>Booking Status</div>
+        <div class="card-body" style="height: 260px;"><canvas id="chartStatus"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header fw-semibold"><i class="bi bi-bar-chart me-2 text-secondary"></i>Bookings Over Time</div>
+        <div class="card-body" style="height: 260px;"><canvas id="chartBookings"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header fw-semibold"><i class="bi bi-currency-exchange me-2 text-secondary"></i>Revenue vs Expenses</div>
+        <div class="card-body" style="height: 260px;"><canvas id="chartRevenue"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="fw-semibold"><i class="bi bi-receipt me-2 text-secondary"></i>Booking / Revenue Report</span>
+      <div class="d-flex gap-2 flex-wrap">
+        <span class="badge text-bg-light border">Rental value: <span class="text-primary">Rs {{ '%.2f'|format(booking_report.rental_total) }}</span></span>
+        <span class="badge text-bg-light border">Recorded payments: <span class="text-success">Rs {{ '%.2f'|format(booking_report.paid_total) }}</span></span>
+        <span class="badge text-bg-light border">Outstanding: <span class="text-danger">Rs {{ '%.2f'|format(booking_report.outstanding) }}</span></span>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Booking</th>
+            <th>Customer</th>
+            <th>Car</th>
+            <th>Pickup</th>
+            <th>Return</th>
+            <th>Status</th>
+            <th class="text-end">Rental</th>
+            <th class="text-end">Paid</th>
+            <th class="text-end">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in booking_report.rows %}
+            <tr>
+              <td class="fw-semibold">{{ item.booking.booking_number }}</td>
+              <td>{{ item.booking.customer.user.first_name }} {{ item.booking.customer.user.last_name }}</td>
+              <td>{{ item.booking.car.make }} {{ item.booking.car.model }} <span class="text-secondary small">({{ item.booking.car.license_plate }})</span></td>
+              <td>{{ item.booking.pickup_datetime.strftime("%Y-%m-%d") }}</td>
+              <td>{{ item.booking.return_datetime.strftime("%Y-%m-%d") }}</td>
+              <td><span class="badge {{ booking_status_colors.get(item.booking.status, 'text-bg-secondary') }}">{{ item.booking.status }}</span></td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.rental) }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.paid) }}</td>
+              <td class="text-end {{ 'text-danger' if item.balance > 0 else '' }}">Rs {{ '%.2f'|format(item.balance) }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9" class="text-center text-secondary py-5">
+                <i class="bi bi-receipt fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if from_raw or to_raw or status_filter or branch_filter %}
+                  No bookings match the selected filters.
+                {% else %}
+                  No bookings yet. Bookings will appear here.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        {% if booking_report.rows %}
+          <tfoot class="table-light">
+            <tr>
+              <th colspan="6" class="text-end">{{ booking_report.count }} booking(s)</th>
+              <th class="text-end">Rs {{ '%.2f'|format(booking_report.rental_total) }}</th>
+              <th class="text-end">Rs {{ '%.2f'|format(booking_report.paid_total) }}</th>
+              <th class="text-end">Rs {{ '%.2f'|format(booking_report.outstanding) }}</th>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="fw-semibold"><i class="bi bi-cash-stack me-2 text-secondary"></i>Expense Report</span>
+      <span class="badge text-bg-light border">{{ expense_report.count }} expense(s) · Total: <span class="text-danger">Rs {{ '%.2f'|format(expense_report.total) }}</span></span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Ref</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th class="text-end">Amount</th>
+            <th>Date</th>
+            <th>Branch</th>
+            <th>Car</th>
+            <th>Maintenance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expense in expense_report.rows %}
+            <tr>
+              <td class="fw-semibold">#{{ expense.id }}</td>
+              <td><span class="badge text-bg-light border text-uppercase">{{ expense.category|replace('_', ' ') }}</span></td>
+              <td>{{ expense.description|truncate(45) }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(expense.amount) }}</td>
+              <td>{{ expense.expense_date.strftime("%Y-%m-%d") }}</td>
+              <td>{{ expense.branch.name if expense.branch else '—' }}</td>
+              <td>{{ expense.car.license_plate if expense.car else '—' }}</td>
+              <td>{{ ('#' ~ expense.maintenance.id) if expense.maintenance else '—' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-secondary py-5">
+                <i class="bi bi-cash-stack fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if from_raw or to_raw or category_filter or branch_filter %}
+                  No expenses match the selected filters.
+                {% else %}
+                  No expenses yet. Expenses will appear here.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">
+      <i class="bi bi-car-front me-2 text-secondary"></i>Fleet / Vehicle Report
+      <span class="text-secondary small fw-normal ms-2">{{ fleet_report.count }} vehicle(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Car</th>
+            <th>Category</th>
+            <th>Plate</th>
+            <th>Branch</th>
+            <th>Status</th>
+            <th class="text-end">Bookings</th>
+            <th class="text-end">Maintenance</th>
+            <th class="text-end">Maint. Cost</th>
+            <th class="text-end">Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in fleet_report.rows %}
+            <tr>
+              <td class="fw-semibold">{{ item.car.make }} {{ item.car.model }} <span class="text-secondary small">({{ item.car.year }})</span></td>
+              <td>{{ item.category_name }}</td>
+              <td><code>{{ item.car.license_plate }}</code></td>
+              <td>{{ item.branch_name }}</td>
+              <td><span class="badge {{ car_status_colors.get(item.car.status, 'text-bg-secondary') }}">{{ item.car.status|replace('_', ' ') }}</span></td>
+              <td class="text-end">{{ item.booking_count }}</td>
+              <td class="text-end">{{ item.maintenance_count }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.maintenance_cost) }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.revenue) }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9" class="text-center text-secondary py-5">
+                <i class="bi bi-car-front fs-1 d-block mb-2 text-body-tertiary"></i>
+                No cars in the fleet yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="fw-semibold"><i class="bi bi-building me-2 text-secondary"></i>Branch Summary</span>
+      <span class="text-secondary small">Revenue (recorded payments) and expenses are counted against each branch's real relationships.</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Branch</th>
+            <th>City</th>
+            <th class="text-end">Cars</th>
+            <th class="text-end">Bookings</th>
+            <th class="text-end">Revenue</th>
+            <th class="text-end">Expenses</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in branch_summary.rows %}
+            <tr>
+              <td class="fw-semibold">{{ item.branch.name }}</td>
+              <td>{{ item.branch.city }}</td>
+              <td class="text-end">{{ item.cars }}</td>
+              <td class="text-end">{{ item.bookings }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.revenue) }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(item.expenses) }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-center text-secondary py-5">
+                <i class="bi bi-building fs-1 d-block mb-2 text-body-tertiary"></i>
+                No branches available.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        {% if branch_summary.rows %}
+          <tfoot class="table-light">
+            <tr>
+              <th colspan="4" class="text-end">Total</th>
+              <th class="text-end">Rs {{ '%.2f'|format(branch_summary.total_revenue) }}</th>
+              <th class="text-end">Rs {{ '%.2f'|format(branch_summary.total_expenses) }}</th>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script>
+    (function () {
+      if (typeof Chart === "undefined") { return; }
+      Chart.defaults.font.family = getComputedStyle(document.body).fontFamily || "system-ui";
+      var statusData = {{ chart.booking_status|tojson }};
+      if (document.getElementById("chartStatus")) {
+        new Chart(document.getElementById("chartStatus"), {
+          type: "doughnut",
+          data: {
+            labels: statusData.map(function (d) { return d.label; }),
+            datasets: [{
+              data: statusData.map(function (d) { return d.count; }),
+              backgroundColor: statusData.map(function (d) {
+                var colors = {
+                  pending: "#ffc107", confirmed: "#0d6efd", ongoing: "#0dcaf0",
+                  completed: "#198754", cancelled: "#dc3545"
+                };
+                return colors[d.label] || "#6c757d";
+              })
+            }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
+        });
+      }
+
+      var bookingSeries = {{ chart.bookings_over_time|tojson }};
+      if (document.getElementById("chartBookings")) {
+        new Chart(document.getElementById("chartBookings"), {
+          type: "bar",
+          data: {
+            labels: bookingSeries.map(function (d) { return d.label; }),
+            datasets: [{
+              label: "Bookings", data: bookingSeries.map(function (d) { return d.count; }),
+              backgroundColor: "#0d6efd"
+            }]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+      }
+
+      var revenueSeries = {{ chart.revenue_vs_expenses|tojson }};
+      if (document.getElementById("chartRevenue")) {
+        new Chart(document.getElementById("chartRevenue"), {
+          type: "bar",
+          data: {
+            labels: revenueSeries.map(function (d) { return d.label; }),
+            datasets: [
+              { label: "Revenue", data: revenueSeries.map(function (d) { return d.revenue; }), backgroundColor: "#198754" },
+              { label: "Expenses", data: revenueSeries.map(function (d) { return d.expenses; }), backgroundColor: "#dc3545" }
+            ]
+          },
+          options: { maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
+        });
+      }
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{# Shared booking-status pill, reusing the public website pill styles. #}
+{% macro booking_status(status) -%}
+  {% set classes = {
+    'pending': 'pill-rented',
+    'confirmed': 'pill-available',
+    'ongoing': 'pill-maintenance',
+    'completed': 'pill-light',
+    'cancelled': 'pill-oos'
+  } %}
+  <span class="pill {{ classes.get(status, 'pill-light') }}">
+    {{ status|replace('_', ' ')|title }}
+  </span>
+{%- endmacro %}

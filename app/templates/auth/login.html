@@ -1,0 +1,63 @@
+{% extends "public/base.html" %}
+
+{% block title %}Sign In — CRMS{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="container">
+    <div class="row justify-content-center g-4 align-items-stretch">
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="auth-aside d-flex flex-column justify-content-center">
+          <span class="eyebrow text-crms-lime">Welcome back</span>
+          <h2 class="fw-bold mt-2 mb-3">Sign in to CRMS</h2>
+          <p style="color: rgba(255,255,255,0.72);">
+            Manage your reservations and keep your details up to date.
+          </p>
+          <ul class="list-unstyled small mt-3 mb-0" style="color: rgba(255,255,255,0.72);">
+            <li class="mb-2"><i class="bi bi-check-circle text-crms-lime me-2"></i>View your booking history</li>
+            <li class="mb-2"><i class="bi bi-check-circle text-crms-lime me-2"></i>Faster future reservations</li>
+            <li><i class="bi bi-check-circle text-crms-lime me-2"></i>Keep your details current</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="auth-card h-100">
+          <span class="eyebrow">Account</span>
+          <h3 class="fw-bold mt-2 mb-1">Sign in</h3>
+          <p class="text-muted-2 small mb-4">
+            {% if next_url %}
+              Sign in to continue your booking.
+            {% else %}
+              Enter your account credentials.
+            {% endif %}
+          </p>
+
+          {% if error %}
+            <div class="alert alert-danger py-2">{{ error }}</div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('public.login') }}" novalidate>
+            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+            <div class="mb-3">
+              <label class="form-label" for="login-email">Email address</label>
+              <input type="email" class="form-control" id="login-email" name="email"
+                     value="{{ email or '' }}" required autofocus>
+            </div>
+            <div class="mb-4">
+              <label class="form-label" for="login-password">Password</label>
+              <input type="password" class="form-control" id="login-password"
+                     name="password" required>
+            </div>
+            <button class="btn btn-teal btn-lg w-100" type="submit">Sign in</button>
+          </form>
+
+          <p class="text-center text-muted-2 small mt-4 mb-0">
+            Don't have an account?
+            <a href="{{ url_for('public.register', next=next_url) }}">Create one</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

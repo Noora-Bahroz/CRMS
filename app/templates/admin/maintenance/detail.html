@@ -1,0 +1,116 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Maintenance · #{{ record.id }}{% endblock %}
+{% block page_title %}Maintenance Details{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">
+        Maintenance #{{ record.id }}
+        {% if record.status == 'completed' %}<span class="badge text-bg-success align-middle">Completed</span>
+        {% elif record.status == 'in_progress' %}<span class="badge text-bg-info align-middle">In Progress</span>
+        {% else %}<span class="badge text-bg-secondary align-middle">Scheduled</span>{% endif %}
+      </h2>
+      <p class="text-secondary small mb-0">Created {{ record.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{{ url_for('admin_maintenance.edit', maintenance_id=record.id) }}"><i class="bi bi-pencil me-1"></i>Edit</a>
+      {% if record.status != 'completed' %}
+        <form method="post" action="{{ url_for('admin_maintenance.complete', maintenance_id=record.id) }}"
+              onsubmit="return confirm('Mark this maintenance record as completed?');">
+          <button class="btn btn-outline-success" type="submit"><i class="bi bi-check-lg me-1"></i>Mark Completed</button>
+        </form>
+      {% endif %}
+      <a class="btn btn-outline-secondary" href="{{ url_for('admin_maintenance.index') }}">Back</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-info-circle me-2 text-secondary"></i>Maintenance Information</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="text-secondary small">Type</div>
+              <div>{{ record.maintenance_type|replace('_', ' ')|upper }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Cost</div>
+              <div class="fs-5 fw-semibold">Rs {{ '%.2f'|format(record.cost) }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Scheduled date</div>
+              <div>{{ record.scheduled_date.strftime("%Y-%m-%d") }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Completed date</div>
+              <div>{{ record.completed_date.strftime("%Y-%m-%d") if record.completed_date else '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Service provider</div>
+              <div>{{ record.service_provider or '—' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Linked expenses</div>
+              <div>{{ record.expenses|length }}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Description</div>
+              <div>{{ record.description }}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Notes</div>
+              <div>{{ record.notes or '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header fw-semibold"><i class="bi bi-car-front me-2 text-secondary"></i>Car</div>
+        <div class="card-body">
+          <div class="fs-5 fw-semibold">{{ record.car.make }} {{ record.car.model }}</div>
+          <hr class="my-3">
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="text-secondary small">License plate</div>
+              <div>{{ record.car.license_plate }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Year</div>
+              <div>{{ record.car.year }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-secondary small">Mileage</div>
+              <div>{{ record.car.mileage }} km</div>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary small">Branch</div>
+              <div>{{ record.car.branch.name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if record.expenses %}
+        <div class="card mt-4">
+          <div class="card-header fw-semibold"><i class="bi bi-cash-stack me-2 text-secondary"></i>Linked Expenses</div>
+          <ul class="list-group list-group-flush">
+            {% for expense in record.expenses %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="small">{{ expense.description }}</span>
+                <a class="text-decoration-none small fw-semibold" href="{{ url_for('admin_expenses.detail', expense_id=expense.id) }}">
+                  Rs {{ '%.2f'|format(expense.amount) }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Admin{% endblock %} · CRMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar collapse" id="adminSidebar">
+    <a class="sidebar-brand" href="{{ url_for('admin_dashboard.dashboard') }}" title="CRMS Admin">
+      <span>CRMS</span><span class="brand-sub">Admin</span>
+    </a>
+    <ul class="sidebar-nav nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link {{ 'active' if request.endpoint == 'admin_dashboard.dashboard' }}" href="{{ url_for('admin_dashboard.dashboard') }}"
+           title="Dashboard"><i class="bi bi-speedometer2"></i><span class="nav-text">Dashboard</span></a>
+      </li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_users') }}" href="{{ url_for('admin_users.index') }}" title="Users"><i class="bi bi-person-badge"></i><span class="nav-text">Users</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_customers') }}" href="{{ url_for('admin_customers.index') }}" title="Customers"><i class="bi bi-people"></i><span class="nav-text">Customers</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_cars') }}" href="{{ url_for('admin_cars.index') }}" title="Cars"><i class="bi bi-car-front"></i><span class="nav-text">Cars</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_categories') }}" href="{{ url_for('admin_categories.index') }}" title="Categories"><i class="bi bi-collection"></i><span class="nav-text">Categories</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_bookings') }}" href="{{ url_for('admin_bookings.index') }}" title="Bookings"><i class="bi bi-calendar-check"></i><span class="nav-text">Bookings</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_pickup_return') }}" href="{{ url_for('admin_pickup_return.index') }}" title="Pickup & Return"><i class="bi bi-arrow-left-right"></i><span class="nav-text">Pickup & Return</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_payments') }}" href="{{ url_for('admin_payments.index') }}" title="Payments"><i class="bi bi-credit-card"></i><span class="nav-text">Payments</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_invoices') }}" href="{{ url_for('admin_invoices.index') }}" title="Invoices"><i class="bi bi-receipt"></i><span class="nav-text">Invoices</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_agreements') }}" href="{{ url_for('admin_agreements.index') }}" title="Rental Agreements"><i class="bi bi-file-earmark-text"></i><span class="nav-text">Rental Agreements</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_drivers') }}" href="{{ url_for('admin_drivers.index') }}" title="Drivers"><i class="bi bi-person-vcard"></i><span class="nav-text">Drivers</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_maintenance') }}" href="{{ url_for('admin_maintenance.index') }}" title="Maintenance"><i class="bi bi-tools"></i><span class="nav-text">Maintenance</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_expenses') }}" href="{{ url_for('admin_expenses.index') }}" title="Expenses"><i class="bi bi-cash-stack"></i><span class="nav-text">Expenses</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_branches') }}" href="{{ url_for('admin_branches.index') }}" title="Branches"><i class="bi bi-building"></i><span class="nav-text">Branches</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('admin_reports') }}" href="{{ url_for('admin_reports.index') }}" title="Reports"><i class="bi bi-graph-up"></i><span class="nav-text">Reports</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a class="nav-link" href="#" data-logout title="Logout"><i class="bi bi-box-arrow-right"></i><span class="nav-text">Logout</span></a>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <button type="button"
+            class="btn btn-outline-secondary px-2 d-lg-none"
+            data-bs-toggle="collapse"
+            data-bs-target="#adminSidebar"
+            aria-controls="adminSidebar" aria-expanded="false">
+      <i class="bi bi-list"></i>
+    </button>
+    <h1 class="h5 mb-0">{% block page_title %}Admin Dashboard{% endblock %}</h1>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <div class="text-end d-none d-md-block">
+        <div class="small fw-semibold">{{ current_user.first_name }} {{ current_user.last_name }}</div>
+        <div class="small text-uppercase text-secondary">{{ current_user.role }}</div>
+      </div>
+      <a class="btn btn-sm btn-outline-secondary" href="#" data-logout title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container-fluid py-4">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

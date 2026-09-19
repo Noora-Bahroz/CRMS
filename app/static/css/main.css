@@ -1,0 +1,21 @@
+/* CRMS base styles — shared across customer site and admin panel. */
+
+:root {
+  --crms-primary: #0d6efd;
+  --crms-sidebar-width: 240px;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.page-title {
+  font-weight: 600;
+}

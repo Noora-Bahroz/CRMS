@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block styles %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/public.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="site-shell">
+
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand brand" href="{{ url_for('public.home') }}">
+          <span class="brand-mark"><i class="bi bi-car-front-fill"></i></span>
+          CRMS<span class="brand-dot">.</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#publicNav" aria-controls="publicNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="publicNav">
+          <ul class="navbar-nav site-nav mx-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if request.endpoint == 'public.home' }}"
+                 href="{{ url_for('public.home') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if request.endpoint in ('cars.index', 'cars.detail') }}"
+                 href="{{ url_for('cars.index') }}">Fleet</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if request.endpoint == 'public.about' }}"
+                 href="{{ url_for('public.about') }}">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if request.endpoint == 'public.contact' }}"
+                 href="{{ url_for('public.contact') }}">Contact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if request.endpoint == 'public.terms' }}"
+                 href="{{ url_for('public.terms') }}">Terms</a>
+            </li>
+            {% if current_user and current_user.customer %}
+              <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('customer.') }}"
+                   href="{{ url_for('customer.dashboard') }}">My Account</a>
+              </li>
+            {% endif %}
+          </ul>
+
+          <div class="header-actions">
+            {% if current_user %}
+              <span class="text-muted small d-none d-xl-inline">
+                <i class="bi bi-person-circle me-1"></i>{{ current_user.first_name }}
+              </span>
+              <form method="post" action="{{ url_for('public.logout') }}" class="d-inline">
+                <button class="btn btn-outline-teal btn-sm" type="submit">
+                  <i class="bi bi-box-arrow-right me-1"></i>Sign out
+                </button>
+              </form>
+            {% else %}
+              <a class="btn btn-outline-teal btn-sm" href="{{ url_for('public.login') }}">Sign in</a>
+              <a class="btn btn-teal btn-sm" href="{{ url_for('public.register') }}">Register</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  {% from "components/alerts.html" import render_alerts %}
+  <div class="container pt-3">
+    {{ render_alerts() }}
+  </div>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <a class="brand text-white mb-3" href="{{ url_for('public.home') }}">
+            <span class="brand-mark"><i class="bi bi-car-front-fill"></i></span>
+            CRMS<span class="brand-dot">.</span>
+          </a>
+          <p class="mt-3 mb-4" style="max-width: 22rem;">
+            Premium car rental with a maintained fleet, transparent daily rates,
+            and branch pickup across the network.
+          </p>
+          <div class="footer-social">
+            <a href="{{ url_for('public.contact') }}" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="{{ url_for('public.contact') }}" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="{{ url_for('public.contact') }}" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="{{ url_for('public.contact') }}" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h6>Company</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="{{ url_for('public.home') }}">Home</a></li>
+            <li><a href="{{ url_for('cars.index') }}">Fleet</a></li>
+            <li><a href="{{ url_for('public.about') }}">About</a></li>
+            <li><a href="{{ url_for('public.contact') }}">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h6>Account</h6>
+          <ul class="list-unstyled footer-links">
+            <li><a href="{{ url_for('public.register') }}">Register</a></li>
+            <li><a href="{{ url_for('public.login') }}">Sign in</a></li>
+            <li><a href="{{ url_for('public.terms') }}">Terms &amp; Conditions</a></li>
+            <li><a href="{{ url_for('public.terms') }}">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4">
+          <h6>Get in touch</h6>
+          <ul class="list-unstyled footer-links">
+            <li><i class="bi bi-telephone me-2"></i>+92 21 111 222 333</li>
+            <li><i class="bi bi-envelope me-2"></i>support@crms.example</li>
+            <li><i class="bi bi-geo-alt me-2"></i>Main Shahrah-e-Faisal, PECHS, Karachi</li>
+            <li><i class="bi bi-clock me-2"></i>Daily 08:00 – 20:00</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-wrap justify-content-between gap-2">
+        <span>&copy; {{ now.year }} CRMS. All rights reserved.</span>
+        <span>Demo project — not a live commercial service.</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/public.js') }}"></script>
+  {% block page_scripts %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "layouts/customer.html" %}
+{% from "bookings/_status.html" import booking_status %}
+
+{% block customer_title %}My Bookings{% endblock %}
+
+{% block customer_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <p class="text-muted-2 mb-0">
+    <strong>{{ bookings|length }}</strong> booking{{ '' if bookings|length == 1 else 's' }} on your account.
+  </p>
+  <a class="btn btn-teal" href="{{ url_for('cars.index') }}">
+    <i class="bi bi-plus-lg me-1"></i>New booking
+  </a>
+</div>
+
+{% if bookings %}
+  <div class="filter-card">
+    <div class="table-responsive">
+      <table class="table account-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Booking</th><th>Car</th><th>Pickup</th><th>Return</th>
+            <th>Status</th><th class="text-end">Total</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+            <tr>
+              <td class="fw-semibold">{{ booking.booking_number }}</td>
+              <td>{{ booking.car.make }} {{ booking.car.model }}</td>
+              <td>{{ booking.pickup_datetime.strftime('%d %b %Y, %H:%M') }}</td>
+              <td>{{ booking.return_datetime.strftime('%d %b %Y, %H:%M') }}</td>
+              <td>{{ booking_status(booking.status) }}</td>
+              <td class="text-end">PKR {{ '{:,.0f}'.format(booking.total_amount) }}</td>
+              <td class="text-end">
+                <a class="btn btn-outline-teal btn-sm"
+                   href="{{ url_for('customer.booking_detail', booking_id=booking.id) }}">View details</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <i class="bi bi-journal-x fs-1 text-crms-teal"></i>
+    <h4 class="mt-3 mb-1">No bookings yet</h4>
+    <p class="text-muted-2 mb-3">Browse the fleet and reserve your first car.</p>
+    <a class="btn btn-teal" href="{{ url_for('cars.index') }}">Browse cars</a>
+  </div>
+{% endif %}
+{% endblock %}

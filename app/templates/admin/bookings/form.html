@@ -1,0 +1,138 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if booking %}Edit{% else %}New{% endif %} Booking{% endblock %}
+{% block page_title %}{% if booking %}Edit Booking{% else %}New Booking{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-11">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-calendar-check me-2 text-secondary"></i>{{ 'Edit Booking' if booking else 'New Booking' }}
+          {% if booking %}<span class="text-secondary ms-2"><code>{{ booking.booking_number }}</code></span>{% endif %}
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="customer_id">Customer</label>
+                <select class="form-select" id="customer_id" name="customer_id" required>
+                  <option value="">Select customer…</option>
+                  {% for customer in customers %}
+                    <option value="{{ customer.id }}" {{ 'selected' if form.get('customer_id')|int == customer.id }}>
+                      {{ customer.user.first_name }} {{ customer.user.last_name }} · {{ customer.user.email }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="car_id">Car</label>
+                <select class="form-select" id="car_id" name="car_id" required>
+                  <option value="">Select car…</option>
+                  {% for car in cars %}
+                    <option value="{{ car.id }}" {{ 'selected' if form.get('car_id')|int == car.id }}>
+                      {{ car.make }} {{ car.model }} ({{ car.license_plate }}) · {{ car.branch.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pickup_branch_id">Pickup Branch</label>
+                <select class="form-select" id="pickup_branch_id" name="pickup_branch_id" required>
+                  <option value="">Select pickup branch…</option>
+                  {% for branch in branches %}
+                    <option value="{{ branch.id }}" {{ 'selected' if form.get('pickup_branch_id')|int == branch.id }}>{{ branch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="return_branch_id">Return Branch</label>
+                <select class="form-select" id="return_branch_id" name="return_branch_id" required>
+                  <option value="">Select return branch…</option>
+                  {% for branch in branches %}
+                    <option value="{{ branch.id }}" {{ 'selected' if form.get('return_branch_id')|int == branch.id }}>{{ branch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pickup_datetime">Pickup Date/Time</label>
+                <input class="form-control" id="pickup_datetime" name="pickup_datetime" type="datetime-local"
+                       value="{{ form.get('pickup_datetime', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="return_datetime">Return Date/Time</label>
+                <input class="form-control" id="return_datetime" name="return_datetime" type="datetime-local"
+                       value="{{ form.get('return_datetime', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="driver_id">Driver <span class="text-secondary fw-normal">(optional)</span></label>
+                <select class="form-select" id="driver_id" name="driver_id">
+                  <option value="">No driver</option>
+                  {% for driver in drivers %}
+                    <option value="{{ driver.id }}" {{ 'selected' if form.get('driver_id')|int == driver.id }}>
+                      {{ driver.first_name }} {{ driver.last_name }} · {{ driver.license_number }} · Rs {{ '%.0f'|format(driver.daily_rate) }}/day
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" name="status">
+                  {% for status in statuses %}
+                    <option value="{{ status }}" {{ 'selected' if form.get('status') == status }}>{{ status|upper }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-12 mt-4">
+                <h6 class="text-uppercase text-secondary small fw-semibold mb-0">Adjustments <span class="text-muted text-lowercase">(base price, driver cost, and deposit are calculated automatically)</span></h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="additional_charges">Additional Charges</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="additional_charges" name="additional_charges" type="number" step="0.01" min="0"
+                         value="{{ form.get('additional_charges', '0.00') }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="discount">Discount</label>
+                <div class="input-group">
+                  <span class="input-group-text">Rs</span>
+                  <input class="form-control" id="discount" name="discount" type="number" step="0.01" min="0"
+                         value="{{ form.get('discount', '0.00') }}">
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch mt-2">
+                  <input class="form-check-input" type="checkbox" role="switch" id="requires_driver" name="requires_driver" value="1"
+                         {{ 'checked' if form.get('requires_driver') in ('1', 1, True, 'on') }}>
+                  <label class="form-check-label" for="requires_driver">Requires a driver</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ form.get('notes', '') }}</textarea>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary"
+                 href="{{ url_for('admin_bookings.detail', booking_id=booking.id) if booking else url_for('admin_bookings.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

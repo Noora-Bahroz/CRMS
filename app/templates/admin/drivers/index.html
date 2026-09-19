@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Drivers{% endblock %}
+{% block page_title %}Drivers{% endblock %}
+
+{% block content %}
+  {% set status_colors = {
+    'available': 'text-bg-success',
+    'on_trip': 'text-bg-primary',
+    'off_duty': 'text-bg-warning',
+    'inactive': 'text-bg-secondary',
+  } %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Drivers</h2>
+      <p class="text-secondary small mb-0">Hired / additional drivers customers can request.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_drivers.new') }}"><i class="bi bi-plus-lg me-1"></i>Add Driver</a>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Driver</th>
+            <th>License No.</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Daily Rate</th>
+            <th>License Expiry</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for driver in drivers %}
+            <tr>
+              <td class="fw-semibold">{{ driver.first_name }} {{ driver.last_name }}</td>
+              <td>{{ driver.license_number }}</td>
+              <td>{{ driver.phone or '—' }}</td>
+              <td>{{ driver.email or '—' }}</td>
+              <td>
+                <span class="badge {{ status_colors.get(driver.status, 'text-bg-secondary') }}">{{ driver.status.replace('_', ' ') }}</span>
+              </td>
+              <td>PKR {{ "{:,.0f}".format(driver.daily_rate) }}</td>
+              <td>{{ driver.license_expiry.strftime("%Y-%m-%d") }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_drivers.edit', driver_id=driver.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{{ url_for('admin_drivers.delete', driver_id=driver.id) }}"
+                      onsubmit="return confirm('Delete driver {{ driver.first_name }} {{ driver.last_name }}?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-secondary py-5">
+                <i class="bi bi-person-vcard fs-1 d-block mb-2 text-body-tertiary"></i>
+                No drivers yet. Add your first driver to get started.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

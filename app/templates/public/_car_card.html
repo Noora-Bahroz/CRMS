@@ -1,0 +1,62 @@
+{% macro status_pill(car) -%}
+  {% set classes = {
+    'available': 'pill-available',
+    'rented': 'pill-rented',
+    'maintenance': 'pill-maintenance',
+    'out_of_service': 'pill-oos'
+  } %}
+  {% set labels = {
+    'available': 'Available',
+    'rented': 'On rent',
+    'maintenance': 'Maintenance',
+    'out_of_service': 'Out of service'
+  } %}
+  <span class="pill {{ classes.get(car.status, 'pill-light') }}">
+    {{ labels.get(car.status, car.status|replace('_', ' ')|title) }}
+  </span>
+{%- endmacro %}
+
+{% macro car_image(car) -%}
+  {{ car.image_url or url_for('static', filename='img/car-placeholder.svg') }}
+{%- endmacro %}
+
+{% macro car_card(car) -%}
+  <article class="car-card h-100">
+    <div class="car-media">
+      <span class="pill pill-light">
+        {{ car.category.name if car.category else 'Vehicle' }}
+      </span>
+      <img src="{{ car_image(car) }}" alt="{{ car.make }} {{ car.model }}">
+    </div>
+    <div class="car-body">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <h3 class="car-title mb-0">{{ car.make }} {{ car.model }}</h3>
+        {{ status_pill(car) }}
+      </div>
+      <p class="car-meta mb-2">
+        <i class="bi bi-geo-alt me-1"></i>{{ car.branch.name if car.branch else 'CRMS' }}
+      </p>
+
+      <div class="car-specs">
+        <span><i class="bi bi-calendar3 me-1"></i>{{ car.year }}</span>
+        {% if car.color %}<span><i class="bi bi-palette me-1"></i>{{ car.color }}</span>{% endif %}
+        <span><i class="bi bi-tag me-1"></i>{{ car.category.name if car.category else '—' }}</span>
+      </div>
+
+      <div class="car-foot mt-auto">
+        <span class="car-price">
+          <span class="amount">PKR {{ '{:,.0f}'.format(car.category.daily_rate) if car.category else '—' }}</span>
+          <span class="per">/ day</span>
+        </span>
+        <a class="btn btn-outline-teal btn-sm"
+           href="{{ url_for('cars.detail', car_id=car.id) }}">Details</a>
+        <a class="btn btn-teal btn-sm"
+           href="{{ url_for('bookings.new', car_id=car.id,
+                pickup_datetime=request.args.get('pickup_datetime'),
+                return_datetime=request.args.get('return_datetime'),
+                pickup_branch_id=request.args.get('branch'),
+                return_branch_id=request.args.get('return_branch_id')) }}">Rent Now</a>
+      </div>
+    </div>
+  </article>
+{%- endmacro %}

@@ -1,0 +1,110 @@
+{% extends "public/base.html" %}
+
+{% block title %}Contact Us — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Contact</li>
+      </ol>
+    </nav>
+    <span class="eyebrow text-crms-lime">Get in touch</span>
+    <h1 class="fw-bold mt-2 mb-2">Contact CRMS</h1>
+    <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+      Questions about a car, a booking, or a branch? Send us a message.
+    </p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5">
+        <span class="eyebrow">Direct lines</span>
+        <h2 class="section-title mt-2 mb-4">We are here to help</h2>
+        <ul class="list-unstyled">
+          <li class="feature-line">
+            <div class="feature-ico"><i class="bi bi-telephone"></i></div>
+            <div>
+              <strong class="d-block">Phone</strong>
+              <span class="small text-muted-2">+92 21 111 222 333</span>
+            </div>
+          </li>
+          <li class="feature-line">
+            <div class="feature-ico"><i class="bi bi-envelope"></i></div>
+            <div>
+              <strong class="d-block">Email</strong>
+              <span class="small text-muted-2">support@crms.example</span>
+            </div>
+          </li>
+          <li class="feature-line">
+            <div class="feature-ico"><i class="bi bi-clock"></i></div>
+            <div>
+              <strong class="d-block">Opening hours</strong>
+              <span class="small text-muted-2">Daily 08:00 – 20:00</span>
+            </div>
+          </li>
+          <li class="feature-line">
+            <div class="feature-ico"><i class="bi bi-geo-alt"></i></div>
+            <div>
+              <strong class="d-block">Head office</strong>
+              <span class="small text-muted-2">Main Shahrah-e-Faisal, PECHS, Karachi</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="auth-card">
+          <span class="eyebrow">Send a message</span>
+          <h3 class="fw-bold mt-2 mb-3">Tell us what you need</h3>
+
+          {% if errors %}
+            <div class="alert alert-danger py-2">
+              {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('public.contact') }}" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="contact-name">Your name</label>
+                <input type="text" class="form-control" id="contact-name" name="name"
+                       value="{{ form.get('name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="contact-email">Email address</label>
+                <input type="email" class="form-control" id="contact-email" name="email"
+                       value="{{ form.get('email', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="contact-phone">Phone (optional)</label>
+                <input type="text" class="form-control" id="contact-phone" name="phone"
+                       value="{{ form.get('phone', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="contact-subject">Subject (optional)</label>
+                <input type="text" class="form-control" id="contact-subject" name="subject"
+                       value="{{ form.get('subject', '') }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="contact-message">Message</label>
+                <textarea class="form-control" id="contact-message" name="message" rows="5"
+                          required>{{ form.get('message', '') }}</textarea>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-teal btn-lg" type="submit">
+                  <i class="bi bi-send me-1"></i>Send message
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

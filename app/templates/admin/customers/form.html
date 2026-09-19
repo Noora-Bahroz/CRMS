@@ -1,0 +1,124 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if customer %}Edit{% else %}New{% endif %} Customer{% endblock %}
+{% block page_title %}{% if customer %}Edit Customer{% else %}Add Customer{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card">
+        <div class="card-header fw-semibold">
+          <i class="bi bi-people me-2 text-secondary"></i>{{ 'Edit' if customer else 'Add' }} Customer
+        </div>
+        <div class="card-body">
+          {% if errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <h6 class="text-uppercase text-secondary small fw-semibold mb-0">Login Account</h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="first_name">First Name</label>
+                <input class="form-control" id="first_name" name="first_name" value="{{ form.get('first_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="last_name">Last Name</label>
+                <input class="form-control" id="last_name" name="last_name" value="{{ form.get('last_name', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" name="email" type="email" value="{{ form.get('email', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-control" id="username" name="username" value="{{ form.get('username', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control" id="password" name="password" type="password" autocomplete="new-password"
+                       {% if not customer %}required{% endif %}
+                       placeholder="{{ 'Leave blank to keep current password' if customer else 'Minimum 6 characters' }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="phone">Phone</label>
+                <input class="form-control" id="phone" name="phone" value="{{ form.get('phone', '') }}">
+              </div>
+
+              <div class="col-12 mt-4">
+                <h6 class="text-uppercase text-secondary small fw-semibold mb-0">Driver &amp; Contact Details</h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="driver_license_number">Driver License Number</label>
+                <input class="form-control" id="driver_license_number" name="driver_license_number"
+                       value="{{ form.get('driver_license_number', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="driver_license_expiry">License Expiry</label>
+                <input class="form-control" id="driver_license_expiry" name="driver_license_expiry" type="date"
+                       value="{{ form.get('driver_license_expiry', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="date_of_birth">Date of Birth</label>
+                <input class="form-control" id="date_of_birth" name="date_of_birth" type="date"
+                       value="{{ form.get('date_of_birth', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="emergency_contact_name">Emergency Contact Name</label>
+                <input class="form-control" id="emergency_contact_name" name="emergency_contact_name"
+                       value="{{ form.get('emergency_contact_name', '') }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="emergency_contact_phone">Emergency Contact Phone</label>
+                <input class="form-control" id="emergency_contact_phone" name="emergency_contact_phone"
+                       value="{{ form.get('emergency_contact_phone', '') }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="address">Address</label>
+                <input class="form-control" id="address" name="address" value="{{ form.get('address', '') }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="city">City</label>
+                <input class="form-control" id="city" name="city" value="{{ form.get('city', '') }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="state">State</label>
+                <input class="form-control" id="state" name="state" value="{{ form.get('state', '') }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="zip_code">Zip Code</label>
+                <input class="form-control" id="zip_code" name="zip_code" value="{{ form.get('zip_code', '') }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="notes">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2">{{ form.get('notes', '') }}</textarea>
+              </div>
+
+              {% if customer %}
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" value="1"
+                           {{ 'checked' if form.get('is_active') in ('1', 1, True, 'on') }}>
+                    <label class="form-check-label" for="is_active">Account Active</label>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Save</button>
+              <a class="btn btn-outline-secondary"
+                 href="{{ url_for('admin_customers.detail', customer_id=customer.id) if customer else url_for('admin_customers.index') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Maintenance{% endblock %}
+{% block page_title %}Maintenance{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Maintenance</h2>
+      <p class="text-secondary small mb-0">Service, repair and inspection records for fleet vehicles.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_maintenance.new') }}"><i class="bi bi-plus-lg me-1"></i>New Record</a>
+  </div>
+
+  <form class="mb-3 row g-2" method="get" action="{{ url_for('admin_maintenance.index') }}" role="search">
+    <div class="col-auto input-group" style="max-width: 420px;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input class="form-control" type="search" name="q" placeholder="Search car, type, provider…"
+             value="{{ search_term }}" aria-label="Search maintenance">
+    </div>
+    <div class="col-auto">
+      <select class="form-select" name="status" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        {% for status in statuses %}
+          <option value="{{ status }}" {{ 'selected' if status == status_filter }}>{{ status|replace('_', ' ')|upper }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" type="submit">Filter</button>
+      {% if search_term or status_filter %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_maintenance.index') }}" title="Clear">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Car</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Scheduled</th>
+            <th>Completed</th>
+            <th class="text-end">Cost</th>
+            <th>Provider</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td class="fw-semibold">
+                <a class="text-decoration-none" href="{{ url_for('admin_maintenance.detail', maintenance_id=record.id) }}">
+                  {{ record.car.make }} {{ record.car.model }}
+                </a>
+                <span class="d-block text-secondary small">{{ record.car.license_plate }}</span>
+              </td>
+              <td>{{ record.maintenance_type|replace('_', ' ')|upper }}</td>
+              <td>
+                {% if record.status == 'completed' %}<span class="badge text-bg-success">Completed</span>
+                {% elif record.status == 'in_progress' %}<span class="badge text-bg-info">In Progress</span>
+                {% else %}<span class="badge text-bg-secondary">Scheduled</span>{% endif %}
+              </td>
+              <td>{{ record.scheduled_date.strftime("%Y-%m-%d") }}</td>
+              <td>{{ record.completed_date.strftime("%Y-%m-%d") if record.completed_date else '—' }}</td>
+              <td class="text-end">Rs {{ '%.2f'|format(record.cost) }}</td>
+              <td>{{ record.service_provider or '—' }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_maintenance.detail', maintenance_id=record.id) }}" title="View"><i class="bi bi-eye"></i></a>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_maintenance.edit', maintenance_id=record.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                {% if record.status != 'completed' %}
+                  <form class="d-inline" method="post" action="{{ url_for('admin_maintenance.complete', maintenance_id=record.id) }}"
+                        onsubmit="return confirm('Mark this maintenance record as completed?');">
+                    <button class="btn btn-sm btn-outline-success" type="submit" title="Mark completed"><i class="bi bi-check-lg"></i></button>
+                  </form>
+                {% endif %}
+                <form class="d-inline" method="post" action="{{ url_for('admin_maintenance.delete', maintenance_id=record.id) }}"
+                      onsubmit="return confirm('Delete this maintenance record?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-secondary py-5">
+                <i class="bi bi-tools fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if search_term or status_filter %}
+                  No maintenance records match your filters.
+                {% else %}
+                  No maintenance records yet. Create your first record to get started.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

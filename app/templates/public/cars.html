@@ -1,0 +1,104 @@
+{% extends "public/base.html" %}
+{% from "public/_car_card.html" import car_card %}
+
+{% block title %}Our Fleet — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Fleet</li>
+      </ol>
+    </nav>
+    <span class="eyebrow text-crms-lime">Our fleet</span>
+    <h1 class="fw-bold mt-2 mb-2">Find your perfect car</h1>
+    <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+      Filter by category, branch and rental dates to see what is available.
+    </p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="filter-card mb-4">
+      <form method="get" action="{{ url_for('cars.index') }}" data-range-form>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6 col-lg-3">
+            <label class="form-label" for="filter-category">Category</label>
+            <select class="form-select" id="filter-category" name="category">
+              <option value="">All categories</option>
+              {% for category in categories %}
+                <option value="{{ category.id }}"
+                  {{ 'selected' if category_filter == category.id }}>{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <label class="form-label" for="filter-branch">Branch</label>
+            <select class="form-select" id="filter-branch" name="branch">
+              <option value="">Any branch</option>
+              {% for branch in branches %}
+                <option value="{{ branch.id }}"
+                  {{ 'selected' if branch_filter == branch.id }}>{{ branch.name }} — {{ branch.city }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <label class="form-label" for="filter-pickup">Pickup date &amp; time</label>
+            <input type="datetime-local" class="form-control" id="filter-pickup"
+                   name="pickup_datetime" value="{{ pickup_raw or '' }}">
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <label class="form-label" for="filter-return">Return date &amp; time</label>
+            <input type="datetime-local" class="form-control" id="filter-return"
+                   name="return_datetime" value="{{ return_raw or '' }}">
+          </div>
+        </div>
+
+        {% if errors %}
+          <div class="alert alert-warning mt-3 mb-0 py-2 small">
+            {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <button class="btn btn-teal" type="submit">
+            <i class="bi bi-search me-1"></i>Search availability
+          </button>
+          <a class="btn btn-outline-teal" href="{{ url_for('cars.index') }}">Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <p class="mb-0 text-muted-2">
+        <strong>{{ cars|length }}</strong>
+        {{ 'car' if cars|length == 1 else 'cars' }}
+        {% if availability_applied %}available for your dates{% else %}in the fleet{% endif %}
+      </p>
+      {% if availability_applied %}
+        <span class="pill pill-available">
+          <i class="bi bi-calendar-check"></i>Date availability applied
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="row g-4">
+      {% for car in cars %}
+        <div class="col-md-6 col-lg-4">{{ car_card(car) }}</div>
+      {% else %}
+        <div class="col-12">
+          <div class="empty-state">
+            <i class="bi bi-search fs-1 text-crms-teal"></i>
+            <h4 class="mt-3 mb-1">No cars match your filters</h4>
+            <p class="text-muted-2 mb-3">Try a different category, branch, or date range.</p>
+            <a class="btn btn-teal" href="{{ url_for('cars.index') }}">Clear filters</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

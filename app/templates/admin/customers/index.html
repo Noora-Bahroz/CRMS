@@ -1,0 +1,83 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Customers{% endblock %}
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="h5 mb-0">Customers</h2>
+      <p class="text-secondary small mb-0">Registered rental customers and their login accounts.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin_customers.new') }}"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
+  </div>
+
+  <form class="mb-3" method="get" action="{{ url_for('admin_customers.index') }}" role="search">
+    <div class="input-group" style="max-width: 420px;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input class="form-control" type="search" name="q" placeholder="Search name, email, or license…"
+             value="{{ search_term }}" aria-label="Search customers">
+      <button class="btn btn-outline-secondary" type="submit">Search</button>
+      {% if search_term %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin_customers.index') }}" title="Clear">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>License No.</th>
+            <th>City</th>
+            <th>Bookings</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+            <tr>
+              <td class="fw-semibold">
+                <a class="text-decoration-none" href="{{ url_for('admin_customers.detail', customer_id=customer.id) }}">
+                  {{ customer.user.first_name }} {{ customer.user.last_name }}
+                </a>
+              </td>
+              <td>{{ customer.user.email }}</td>
+              <td>{{ customer.driver_license_number }}</td>
+              <td>{{ customer.city or '—' }}</td>
+              <td><span class="badge text-bg-light border">{{ customer.bookings|length }}</span></td>
+              <td>
+                <span class="badge {{ 'text-bg-success' if customer.user.is_active else 'text-bg-secondary' }}">
+                  {{ 'Active' if customer.user.is_active else 'Inactive' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_customers.detail', customer_id=customer.id) }}" title="View"><i class="bi bi-eye"></i></a>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_customers.edit', customer_id=customer.id) }}" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form class="d-inline" method="post" action="{{ url_for('admin_customers.delete', customer_id=customer.id) }}"
+                      onsubmit="return confirm('Delete customer {{ customer.user.first_name }} {{ customer.user.last_name }}?');">
+                  <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-secondary py-5">
+                <i class="bi bi-people fs-1 d-block mb-2 text-body-tertiary"></i>
+                {% if search_term %}
+                  No customers match &quot;{{ search_term }}&quot;.
+                {% else %}
+                  No customers yet. Add your first customer to get started.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

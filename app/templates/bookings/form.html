@@ -1,0 +1,132 @@
+{% extends "public/base.html" %}
+
+{% block title %}Book a Car — CRMS{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('cars.index') }}">Fleet</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Book</li>
+      </ol>
+    </nav>
+    <span class="eyebrow text-crms-lime">Reservation</span>
+    <h1 class="fw-bold mt-2 mb-2">Book your car</h1>
+    <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+      Choose your rental details. You'll review the price before confirming.
+    </p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="filter-card">
+          {% if errors %}
+            <div class="alert alert-danger py-2">
+              {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('bookings.new') }}"
+                data-range-form novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="book-car">Car <span class="text-danger">*</span></label>
+                <select class="form-select" id="book-car" name="car_id" required>
+                  <option value="">Select a car…</option>
+                  {% for car in cars %}
+                    <option value="{{ car.id }}" {{ 'selected' if form.get('car_id')|int == car.id }}>
+                      {{ car.make }} {{ car.model }}
+                      {% if car.category %}· {{ car.category.name }}{% endif %}
+                      {% if car.category %}· PKR {{ '{:,.0f}'.format(car.category.daily_rate) }}/day{% endif %}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="book-pickup-branch">Pickup branch <span class="text-danger">*</span></label>
+                <select class="form-select" id="book-pickup-branch" name="pickup_branch_id" required>
+                  <option value="">Select pickup branch…</option>
+                  {% for branch in branches %}
+                    <option value="{{ branch.id }}" {{ 'selected' if form.get('pickup_branch_id')|int == branch.id }}>
+                      {{ branch.name }} — {{ branch.city }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="book-return-branch">Return branch <span class="text-danger">*</span></label>
+                <select class="form-select" id="book-return-branch" name="return_branch_id" required>
+                  <option value="">Select return branch…</option>
+                  {% for branch in branches %}
+                    <option value="{{ branch.id }}" {{ 'selected' if form.get('return_branch_id')|int == branch.id }}>
+                      {{ branch.name }} — {{ branch.city }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="book-pickup">Pickup date &amp; time <span class="text-danger">*</span></label>
+                <input type="datetime-local" class="form-control" id="book-pickup"
+                       name="pickup_datetime" value="{{ form.get('pickup_datetime', '') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="book-return">Return date &amp; time <span class="text-danger">*</span></label>
+                <input type="datetime-local" class="form-control" id="book-return"
+                       name="return_datetime" value="{{ form.get('return_datetime', '') }}" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="book-driver">Driver <span class="text-muted-2 fw-normal">(optional)</span></label>
+                <select class="form-select" id="book-driver" name="driver_id">
+                  <option value="">No driver — I'll drive</option>
+                  {% for driver in drivers %}
+                    <option value="{{ driver.id }}" {{ 'selected' if form.get('driver_id')|int == driver.id }}>
+                      {{ driver.first_name }} {{ driver.last_name }} · PKR {{ '{:,.0f}'.format(driver.daily_rate) }}/day
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="book-notes">Special requests <span class="text-muted-2 fw-normal">(optional)</span></label>
+                <input type="text" class="form-control" id="book-notes" name="notes"
+                       value="{{ form.get('notes', '') }}" placeholder="Child seat, airport drop-off…">
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+              <button class="btn btn-teal btn-lg" type="submit">
+                <i class="bi bi-arrow-right-circle me-1"></i>Review booking
+              </button>
+              <a class="btn btn-outline-teal btn-lg" href="{{ url_for('cars.index') }}">
+                Back to fleet
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="booking-aside">
+          <span class="eyebrow">How it works</span>
+          <ol class="booking-steps list-unstyled mt-3 mb-4">
+            <li><span class="step-dot">1</span> Pick your car and rental dates</li>
+            <li><span class="step-dot">2</span> Review the price breakdown</li>
+            <li><span class="step-dot">3</span> Sign in and confirm</li>
+          </ol>
+          <div class="d-flex gap-3 small text-muted-2">
+            <span><i class="bi bi-shield-check text-crms-teal me-1"></i>Insured fleet</span>
+            <span><i class="bi bi-headset text-crms-teal me-1"></i>Support</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
