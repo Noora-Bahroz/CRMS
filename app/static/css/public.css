@@ -7,6 +7,7 @@
    ========================================================================== */
 
 :root {
+  color-scheme: light;
   --teal-900: #082622;
   --teal-800: #0b3733;
   --teal-700: #0e4741;
@@ -38,7 +39,7 @@ html {
 }
 
 body {
-  background: var(--teal-800);
+  background: var(--white);
   color: var(--body);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -54,28 +55,14 @@ a {
   color: var(--teal-600);
 }
 
-/* --- Centered website container over colored background ----------------- */
+/* --- Full-width public layout -------------------------------------------- */
 
 .site-shell {
-  max-width: 1480px;
-  margin: 26px auto;
+  max-width: none;
+  margin: 0;
   background: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 40px 90px rgba(4, 18, 15, 0.35);
-}
-
-@media (max-width: 1400px) {
-  .site-shell {
-    margin: 18px;
-  }
-}
-
-@media (max-width: 767.98px) {
-  .site-shell {
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* --- Typography helpers -------------------------------------------------- */
@@ -212,6 +199,19 @@ a {
   color: #fff;
 }
 
+.btn-outline-ink {
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+}
+
+.btn-outline-ink:hover,
+.btn-outline-ink:focus {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
 .btn-outline-light-2 {
   background: transparent;
   border: 1.5px solid rgba(255, 255, 255, 0.55);
@@ -226,10 +226,21 @@ a {
 /* --- Header / navigation ------------------------------------------------- */
 
 .site-header {
-  background: var(--white);
-  border-bottom: 1px solid var(--line);
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
+  position: relative;
+  z-index: 20;
+  background: #0b0b0b;
+  border-bottom: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.site-header .navbar {
+  --bs-navbar-brand-color: #fff;
+  --bs-navbar-brand-hover-color: #fff;
+  --bs-navbar-color: #fff;
+  --bs-navbar-hover-color: var(--lime);
+  --bs-navbar-active-color: var(--lime);
+  --bs-navbar-toggler-border-color: rgba(255, 255, 255, 0.35);
 }
 
 .site-header .navbar {
@@ -237,7 +248,17 @@ a {
   padding-bottom: 1rem;
 }
 
-.brand {
+/* Pin the brand to the left edge of the navbar container (desktop only —
+   below `lg` the Bootstrap navbar keeps the toggler on the far right). */
+@media (min-width: 992px) {
+  .site-header .navbar > .container {
+    justify-content: flex-start;
+  }
+}
+
+.site-header .navbar .brand,
+.site-header .navbar .brand:hover,
+.site-header .navbar .brand:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -245,7 +266,7 @@ a {
   font-weight: 700;
   font-size: 1.45rem;
   letter-spacing: -0.03em;
-  color: var(--ink) !important;
+  color: #fff !important;
 }
 
 .brand-mark {
@@ -265,7 +286,7 @@ a {
 }
 
 .site-nav .nav-link {
-  color: var(--ink);
+  color: #fff !important;
   font-weight: 500;
   font-size: 0.95rem;
   padding: 0.5rem 0.95rem !important;
@@ -273,12 +294,12 @@ a {
 }
 
 .site-nav .nav-link:hover {
-  color: var(--teal-600);
+  color: var(--lime) !important;
 }
 
 .site-nav .nav-link.active {
-  color: var(--teal-700);
-  background: var(--teal-soft);
+  color: var(--lime) !important;
+  background: rgba(255, 255, 255, 0.1);
   font-weight: 600;
 }
 
@@ -289,37 +310,79 @@ a {
 }
 
 .navbar-toggler {
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 12px;
   padding: 0.4rem 0.6rem;
+  color: #fff;
 }
 
 .navbar-toggler:focus {
   box-shadow: none;
 }
 
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 /* --- Hero ---------------------------------------------------------------- */
+/* Full-viewport backdrop with a luxury automotive photograph.  The dark
+   photo stays dominant; a left-side gradient keeps the copy readable and a
+   short white fade tails the section into the content below. */
 
 .hero {
-  background: var(--white);
-  padding: 3.5rem 0 1.5rem;
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 5.5rem 0 4.5rem;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #0b0b0b;
+  background-image:
+    linear-gradient(
+      110deg,
+      rgba(10, 10, 10, 0.9) 0%,
+      rgba(10, 10, 10, 0.62) 38%,
+      rgba(10, 10, 10, 0.28) 68%,
+      rgba(10, 10, 10, 0.42) 100%
+    ),
+    url("../img/landing/hero-1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 6.5rem;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  pointer-events: none;
+  z-index: 1;
 }
 
 .hero-inner {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 2.5rem;
-  align-items: center;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.hero-copy {
+  max-width: 42rem;
 }
 
 .hero-copy .display-heading {
   margin: 1rem 0 1.25rem;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 
 .hero-copy p {
   font-size: 1.08rem;
   max-width: 31rem;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .hero-actions {
@@ -327,6 +390,12 @@ a {
   flex-wrap: wrap;
   gap: 0.85rem;
   margin-top: 1.75rem;
+}
+
+/* Brand actions keep their green identity but stay legible on the photo. */
+.hero .btn-teal {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
 .hero-stats {
@@ -339,60 +408,46 @@ a {
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--ink);
+  color: #fff;
 }
 
 .hero-stats .stat-label {
   font-size: 0.82rem;
-  color: var(--body);
+  color: rgba(255, 255, 255, 0.72);
 }
 
-.hero-visual {
-  position: relative;
-  background: linear-gradient(150deg, var(--teal-700) 0%, var(--teal-900) 100%);
-  border-radius: 30px;
-  padding: 1.75rem;
-  min-height: 360px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
+/* Premium entrance: a subtle staggered fade + rise for heading, text,
+   actions and stats once the section paints. */
+.hero-copy > * {
+  animation: hero-reveal 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
-.hero-visual::after {
-  content: "";
-  position: absolute;
-  right: -18px;
-  top: -18px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  background: var(--lime);
-  opacity: 0.18;
-}
+.hero-copy > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-copy > *:nth-child(2) { animation-delay: 0.18s; }
+.hero-copy > *:nth-child(3) { animation-delay: 0.31s; }
+.hero-copy > *:nth-child(4) { animation-delay: 0.44s; }
+.hero-copy > *:nth-child(5) { animation-delay: 0.57s; }
 
-.hero-visual img {
-  position: relative;
-  z-index: 1;
-  width: 122%;
-  max-width: none;
-  transform: translateY(2.5rem);
-  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.35));
+@keyframes hero-reveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .hero-badge {
   position: absolute;
-  left: 1.5rem;
-  top: 1.5rem;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  top: 1.75rem;
+  left: 1.75rem;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #fff;
   border-radius: 999px;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1rem;
   font-size: 0.8rem;
   font-weight: 600;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: hero-reveal 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.05s both;
 }
 
 /* --- Search panel -------------------------------------------------------- */
@@ -405,7 +460,7 @@ a {
 
 .search-card {
   background: var(--white);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(10, 18, 16, 0.28);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
@@ -432,7 +487,7 @@ a {
 .search-field .form-select,
 .search-card .form-control,
 .search-card .form-select {
-  border: 1px solid var(--line);
+  border: 1px solid rgba(10, 18, 16, 0.32);
   border-radius: var(--radius-sm);
   padding: 0.65rem 0.85rem;
   background: var(--soft);
@@ -489,6 +544,166 @@ a {
 .brand-word:hover {
   color: var(--teal-600);
 }
+
+/* --- Why choose (full-bleed backdrop section) ---------------------------- */
+/* Section 2 uses the second landing photo as a full-viewport backdrop with a
+   layered gradient so the copy stays readable, then tails into the section
+   below like the hero.  Content is delayed only via `.js` addition so it still
+   renders if JavaScript is unavailable. */
+
+.why {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem 0;
+  background-image: url("../img/landing/why-choose.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.why::before,
+.why::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.why::before {
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.78) 0%,
+    rgba(10, 10, 10, 0.52) 45%,
+    rgba(10, 10, 10, 0.82) 100%
+  );
+}
+
+.why::after {
+  top: 0;
+  height: 6.5rem;
+  background: linear-gradient(
+    180deg,
+    var(--white) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.why > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.why-head {
+  max-width: 46rem;
+  margin: 0 auto;
+  text-align: center;
+  color: #fff;
+}
+
+.why-head .section-title {
+  color: #fff;
+}
+
+.why-lead {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
+}
+
+.why-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 3.25rem;
+}
+
+.why-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1.75rem;
+  color: #fff;
+  display: flex;
+  gap: 1rem;
+}
+
+.why-ico {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--lime);
+  color: var(--teal-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.why-card .small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.why-cta {
+  margin-top: 3.25rem;
+  text-align: center;
+}
+
+/* Scroll-reveal: `.js` is added by public.js, so content stays visible if JS
+   is unavailable; each block fades/rises in with a slight stagger. */
+.js .why .reveal-el,
+.js .fleet .reveal-el,
+.js .promo .reveal-el,
+.js .categories .reveal-el,
+.js .cta-scene .reveal-el {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.js .why .reveal-el.is-revealed,
+.js .fleet .reveal-el.is-revealed,
+.js .promo .reveal-el.is-revealed,
+.js .categories .reveal-el.is-revealed,
+.js .cta-scene .reveal-el.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.js .why .why-card:nth-child(2) { transition-delay: 0.12s; }
+.js .why .why-card:nth-child(3) { transition-delay: 0.24s; }
+.js .why .why-card:nth-child(4) { transition-delay: 0.36s; }
+.js .why .why-cta { transition-delay: 0.48s; }
+
+.js .fleet .fleet-slide:nth-child(1) { transition-delay: 0.1s; }
+.js .fleet .fleet-slide:nth-child(2) { transition-delay: 0.2s; }
+.js .fleet .fleet-slide:nth-child(3) { transition-delay: 0.3s; }
+.js .fleet .fleet-slide:nth-child(4) { transition-delay: 0.4s; }
+.js .fleet .fleet-slide:nth-child(5) { transition-delay: 0.5s; }
+.js .fleet .fleet-slide:nth-child(6) { transition-delay: 0.6s; }
+.js .fleet .fleet-carousel-nav { transition-delay: 0.6s; }
+
+.js .promo .promo-head { transition-delay: 0.05s; }
+.js .promo .price-tag { transition-delay: 0.3s; }
+.js .promo .promo-cta { transition-delay: 0.45s; }
+
+.js .categories .category-card:nth-child(1) { transition-delay: 0.1s; }
+.js .categories .category-card:nth-child(2) { transition-delay: 0.2s; }
+.js .categories .category-card:nth-child(3) { transition-delay: 0.3s; }
+.js .categories .category-card:nth-child(4) { transition-delay: 0.4s; }
+.js .categories .category-card:nth-child(5) { transition-delay: 0.5s; }
+
+.js .cta-scene .cta-head { transition-delay: 0.05s; }
+.js .cta-scene .cta-actions { transition-delay: 0.3s; }
 
 /* --- Split section (Why choose us) -------------------------------------- */
 
@@ -567,6 +782,88 @@ a {
   font-size: 1.2rem;
 }
 
+/* --- Fleet showcase (full-bleed backdrop section) ------------------------ */
+/* Section 3: the third landing photo spans the whole section as a backdrop,
+   with a layered gradient so the heading stays readable and a short white
+   tail into the section below.  The real car cards keep their white card look
+   for contrast; only the wrapper and chrome are layered over the photo. */
+
+.fleet {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem 0;
+  background-image: url("../img/landing/fleet.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.fleet::before,
+.fleet::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.fleet::before {
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.82) 0%,
+    rgba(10, 10, 10, 0.6) 45%,
+    rgba(10, 10, 10, 0.85) 100%
+  );
+}
+
+.fleet::after {
+  bottom: 0;
+  height: 6.5rem;
+  background: linear-gradient(
+    0deg,
+    rgba(10, 10, 10, 1) 0%,
+    rgba(10, 10, 10, 0) 100%
+  );
+}
+
+.fleet > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.fleet .fleet-head {
+  margin-bottom: 2.25rem;
+}
+
+.fleet .fleet-head .section-title {
+  color: #fff;
+}
+
+.fleet .fleet-head p {
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
+}
+
+.fleet .carousel-btn {
+  border-color: var(--lime);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.fleet .carousel-btn:hover {
+  background: var(--lime);
+  color: var(--teal-900);
+  border-color: var(--lime);
+}
+
 /* --- Fleet carousel ------------------------------------------------------ */
 
 .fleet-head {
@@ -638,7 +935,7 @@ a {
 
 .car-media {
   position: relative;
-  background: linear-gradient(150deg, var(--soft) 0%, var(--teal-soft) 100%);
+  background: linear-gradient(150deg, var(--soft) 0%, #edf1ef 100%);
   padding: 1rem;
   min-height: 190px;
   display: flex;
@@ -760,6 +1057,77 @@ a {
   color: #b3261e;
 }
 
+/* --- Promo showcase (full-bleed backdrop section) ------------------------ */
+/* Section 4: the fourth landing photo becomes the entire backdrop with a
+   directional dark gradient (darker on the left where the copy sits) and
+   short white tails into the sections above and below. */
+
+.promo {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem 0;
+  background-image: url("../img/landing/promo.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.promo::before,
+.promo::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.promo::before {
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(10, 10, 10, 0.85) 0%,
+    rgba(10, 10, 10, 0.55) 50%,
+    rgba(10, 10, 10, 0.3) 100%
+  );
+}
+
+.promo::after {
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 1) 0%,
+      rgba(10, 10, 10, 0) 6.5rem
+    ),
+    linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0) 6rem);
+}
+
+.promo > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.promo-content {
+  max-width: 34rem;
+}
+
+.promo-head .section-title {
+  color: #fff;
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
+}
+
+.promo .price-tag {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--lime);
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
+}
+
 /* --- Promo banner -------------------------------------------------------- */
 
 .promo-banner {
@@ -826,6 +1194,69 @@ a {
   width: 128%;
   max-width: none;
   filter: drop-shadow(0 30px 45px rgba(0, 0, 0, 0.4));
+}
+
+/* --- Categories showcase (full-bleed backdrop section) -------------------- */
+/* Section 5: the chosen landing photo backs the whole section; a vertical
+   dark gradient keeps the heading readable and the white category cards pop.
+   Short white tails transition into the promo (above) and CTA band (below). */
+
+.categories {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem 0;
+  background-image: url("../img/landing/categories.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.categories::before,
+.categories::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.categories::before {
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.8) 0%,
+    rgba(10, 10, 10, 0.55) 45%,
+    rgba(10, 10, 10, 0.84) 100%
+  );
+}
+
+.categories::after {
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 1) 0%,
+      rgba(10, 10, 10, 0) 6rem
+    ),
+    linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0) 5.5rem);
+}
+
+.categories > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.categories .fleet-head {
+  margin-bottom: 2.5rem;
+}
+
+.categories .fleet-head .section-title {
+  color: #fff;
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
 }
 
 /* --- Categories ---------------------------------------------------------- */
@@ -897,6 +1328,81 @@ a {
 .category-card:hover .cat-arrow {
   background: var(--lime);
   color: var(--teal-900);
+}
+
+/* --- CTA scene (full-bleed backdrop section) ----------------------------- */
+/* Section 6: reuses Section 3's backdrop photo (fleet.jpg) as the full
+   closing scene.  A vertical dark gradient keeps the copy readable; the top
+   tail blends from the categories section and the bottom tail fades into the
+   dark footer so the page closes cleanly. */
+
+.cta-scene {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6.5rem 0;
+  background-image: url("../img/landing/fleet.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.cta-scene::before,
+.cta-scene::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cta-scene::before {
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.8) 0%,
+    rgba(10, 10, 10, 0.58) 45%,
+    rgba(10, 10, 10, 0.86) 100%
+  );
+}
+
+.cta-scene::after {
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 1) 0%,
+      rgba(10, 10, 10, 0) 5.5rem
+    ),
+    linear-gradient(0deg, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0) 7rem);
+}
+
+.cta-scene > .container {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.cta-scene .section-title {
+  color: #fff;
+  text-shadow: 0 1px 18px rgba(10, 10, 10, 0.35);
+}
+
+.cta-scene p {
+  max-width: 30rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  justify-content: center;
+  margin-top: 2.75rem;
 }
 
 /* --- CTA band ------------------------------------------------------------ */
@@ -985,7 +1491,7 @@ a {
 
 .detail-media {
   border-radius: 28px;
-  background: linear-gradient(150deg, var(--soft) 0%, var(--teal-soft) 100%);
+  background: linear-gradient(150deg, var(--soft) 0%, #edf1ef 100%);
   border: 1px solid var(--line);
   padding: 2rem;
   display: flex;
@@ -1210,7 +1716,7 @@ a {
 /* --- Footer -------------------------------------------------------------- */
 
 .site-footer {
-  background: var(--teal-900);
+  background: #0b0b0b;
   color: rgba(255, 255, 255, 0.66);
   padding: 4rem 0 2rem;
   border-bottom-left-radius: var(--radius-lg);
@@ -1281,20 +1787,42 @@ a {
 }
 
 @media (max-width: 991.98px) {
-  .hero-inner,
+  .hero {
+    padding: 4.5rem 0 3.5rem;
+  }
+
+  .hero-copy {
+    max-width: 36rem;
+  }
+
+  .why {
+    padding: 5.5rem 0 5rem;
+  }
+
+  .why-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fleet {
+    padding: 5.5rem 0 5rem;
+  }
+
+  .promo {
+    padding: 5.5rem 0 5rem;
+  }
+
+  .categories {
+    padding: 5.5rem 0 5rem;
+  }
+
+  .cta-scene {
+    padding: 5.5rem 0 5rem;
+  }
+
   .split,
   .promo-banner {
     grid-template-columns: 1fr;
     gap: 2.5rem;
-  }
-
-  .hero-visual {
-    min-height: 300px;
-  }
-
-  .hero-visual img {
-    width: 100%;
-    transform: translateY(1.5rem);
   }
 
   .search-grid {
@@ -1314,9 +1842,79 @@ a {
   }
 }
 
+@media (max-width: 767.98px) {
+  .why-cards {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .why-card {
+    flex-direction: row;
+  }
+}
+
 @media (max-width: 575.98px) {
   .section-pad {
     padding: 3.5rem 0;
+  }
+
+  .hero {
+    padding: 4rem 0 3.25rem;
+  }
+
+  .why {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .why-cards {
+    gap: 1rem;
+    margin-top: 2.25rem;
+  }
+
+  .why-card {
+    padding: 1.4rem;
+  }
+
+  .why-cta {
+    margin-top: 2.75rem;
+  }
+
+  .fleet {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .fleet .fleet-head {
+    margin-bottom: 1.75rem;
+  }
+
+  .promo {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .promo .price-tag {
+    font-size: 1.7rem;
+  }
+
+  .categories {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .categories .fleet-head {
+    margin-bottom: 2rem;
+  }
+
+  .cta-scene {
+    padding: 4.5rem 0 4rem;
+  }
+
+  .cta-actions {
+    margin-top: 2.25rem;
+  }
+
+  .hero-badge {
+    top: 1.25rem;
+    left: 1.25rem;
+    padding: 0.4rem 0.8rem;
   }
 
   .search-grid {
@@ -1350,5 +1948,20 @@ a {
   .car-card,
   .category-card {
     transition: none;
+  }
+
+  .hero-copy > *,
+  .hero-badge {
+    animation: none;
+  }
+
+  .js .why .reveal-el,
+  .js .fleet .reveal-el,
+  .js .promo .reveal-el,
+  .js .categories .reveal-el,
+  .js .cta-scene .reveal-el {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

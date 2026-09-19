@@ -45,4 +45,10 @@ def create_app(config_name: str | None = None) -> Flask:
             "current_user": get_current_user(),
         }
 
+    # Car photo lookup is needed inside Jinja macros (fleet cards, car
+    # detail), which do not receive render context, so register it globally.
+    from app.car_images import car_image_url
+
+    app.jinja_env.globals["car_image_url"] = car_image_url
+
     return app

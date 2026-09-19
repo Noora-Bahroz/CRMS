@@ -525,8 +525,16 @@ def test_car_detail_has_booking_cta_and_specs(public_db):
     assert "booking-aside" in body
 
 
-def test_local_svg_fallback_images_present(public_db):
+def test_car_photos_by_name_present(public_db):
     client = public_db.test_client()
     body = client.get("/cars").get_data(as_text=True)
-    # Seed cars have no image_url, so the local fallback must be used.
-    assert "img/car-placeholder.svg" in body
+    # Each seeded car renders its own photo (matched by make + model), and
+    # none falls back to the SVG placeholder.  KHI-1002 (Honda Civic) is in
+    # maintenance so it is not listed on the public fleet page.
+    assert "img/cars/toyota-corolla.jpg" in body
+    assert "img/cars/toyota-fortuner.jpg" in body
+    assert "img/cars/kia-sportage.jpg" in body
+    assert "img/cars/hyundai-tucson.jpg" in body
+    assert "img/cars/suzuki-wagon-r.jpg" in body
+    assert "img/cars/honda-civic.jpg" not in body
+    assert "img/car-placeholder.svg" not in body

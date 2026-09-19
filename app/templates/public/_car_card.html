@@ -17,7 +17,7 @@
 {%- endmacro %}
 
 {% macro car_image(car) -%}
-  {{ car.image_url or url_for('static', filename='img/car-placeholder.svg') }}
+  {{ car_image_url(car) }}
 {%- endmacro %}
 
 {% macro car_card(car) -%}
