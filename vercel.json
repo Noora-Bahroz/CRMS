@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "wsgi.py": {
-      "excludeFiles": "{tests/**,docs/**,scripts/**,migrations/**,instance/**,/*.jpg}"
+      "includeFiles": "app/**"
     }
   }
 }
