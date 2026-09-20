@@ -16,6 +16,7 @@ User + Customer pair).  No second auth system is introduced.
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
@@ -198,3 +199,43 @@ def logout():
     logout_user()
     flash("You have been signed out.", "success")
     return redirect(url_for("public.home"))
+
+
+@blueprint.get("/health")
+def health_check():
+    """Diagnose production startup or database connectivity failures."""
+    from sqlalchemy import text
+
+    from app.extensions import db
+
+    secret_ok = bool(current_app.config.get("SECRET_KEY"))
+    db_uri = current_app.config.get("SQLALCHEMY_DATABASE_URI") or ""
+    db_set = bool(db_uri)
+    db_ok = False
+    db_hint = ""
+    if db_set:
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            db_ok = True
+        except Exception as exc:
+            db_hint = f"{type(exc).__name__}: {exc}"
+
+    lines = [
+        f"DEBUG: {current_app.debug}",
+        f"SECRET_KEY set: {secret_ok}",
+        f"DATABASE_URL set: {db_set}",
+        f"DATABASE connection: {'ok' if db_ok else 'FAILED'}",
+    ]
+    if not secret_ok:
+        lines.append("Fix: add SECRET_KEY in Vercel env vars, then Redeploy.")
+    if not db_set:
+        lines.append("Fix: add DATABASE_URL in Vercel env vars, then Redeploy.")
+    elif not db_ok:
+        lines.append(f"Fix: connection error -> {db_hint}")
+    lines.append(
+        "Hint: Supabase connection strings must use postgresql+psycopg2:// and "
+        "URL-encoded passwords (no special characters unescaped)."
+    )
+    healthy = secret_ok and db_ok
+    return "\n".join(lines), 200 if healthy else 503
