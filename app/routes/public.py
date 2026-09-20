@@ -237,5 +237,21 @@ def health_check():
         "Hint: Supabase connection strings must use postgresql+psycopg2:// and "
         "URL-encoded passwords (no special characters unescaped)."
     )
+    path = request.args.get("path", "")
+    if path:
+        import traceback
+
+        client = current_app.test_client()
+        previous = current_app.testing
+        current_app.testing = True
+        try:
+            try:
+                response = client.get(path)
+                lines.append(f"GET {path} -> {response.status_code}")
+            except Exception as exc:
+                lines.append(f"GET {path} raised:")
+                lines.extend(traceback.format_exc().splitlines())
+        finally:
+            current_app.testing = previous
     healthy = secret_ok and db_ok
     return "\n".join(lines), 200 if healthy else 503
