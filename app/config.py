@@ -70,15 +70,23 @@ def get_config(config_name: str | None = None):
 
 
 def validate_production_config(app, config_name: str | None = None) -> None:
-    """Refuse to start production without a usable SECRET_KEY.
+    """Refuse to start production without usable SECRET_KEY and DATABASE_URL.
 
     An empty secret key silently breaks session signing and secure
-    cookies, so production must fail fast instead of booting in a broken
-    and insecure state.
+    cookies, and an empty database URI only crashes on the first query
+    with a cryptic error, so production must fail fast instead of booting
+    in a broken and insecure state.
     """
     name = (config_name or os.getenv("FLASK_CONFIG") or "development").lower()
-    if name == "production" and not app.config.get("SECRET_KEY"):
+    if name != "production":
+        return
+    if not app.config.get("SECRET_KEY"):
         raise RuntimeError(
             "SECRET_KEY must be set when running with the production "
+            "configuration."
+        )
+    if not app.config.get("SQLALCHEMY_DATABASE_URI"):
+        raise RuntimeError(
+            "DATABASE_URL must be set when running with the production "
             "configuration."
         )
